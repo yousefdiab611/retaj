@@ -1,7 +1,7 @@
 {
   "name": "retaj-store-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,20 +14,21 @@
     "test:watch": "vitest",
     "electron": "electron .",
     "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "build:icons": "node scripts/build-icons.cjs",
     "electron:stage-backend": "node scripts/stage-desktop-backend.cjs",
-    "electron-pack": "npm run build && npm run electron:stage-backend && electron-builder",
-    "electron-pack:current": "npm run build && npm run electron:stage-backend && electron-builder",
-    "electron-pack:win": "npm run build && npm run electron:stage-backend && electron-builder --win nsis portable --x64 --publish never",
-    "electron-pack:mac": "npm run build && npm run electron:stage-backend && electron-builder --mac dmg zip --x64 --arm64 --publish never",
-    "electron-pack:linux": "npm run build && npm run electron:stage-backend && electron-builder --linux AppImage deb --x64 --publish never",
-    "electron-pack:all": "npm run build && npm run electron:stage-backend && electron-builder -mwl"
+    "electron-pack": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder",
+    "electron-pack:current": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder",
+    "electron-pack:win": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder --win nsis portable --x64 --publish never",
+    "electron-pack:mac": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder --mac dmg zip --x64 --arm64 --publish never",
+    "electron-pack:linux": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder --linux AppImage deb --x64 --publish never",
+    "electron-pack:all": "npm run build && npm run build:icons && npm run electron:stage-backend && electron-builder -mwl"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
-    "@sentry/react": "^8.50.0",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-scroll-area": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
+    "@sentry/react": "^8.50.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "html5-qrcode": "^2.3.8",
@@ -50,13 +51,15 @@
     "@vitest/coverage-v8": "^2.1.8",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
-    "jsdom": "^25.0.1",
     "electron": "^28.2.0",
     "electron-builder": "^24.13.3",
     "electron-store": "^9.0.0",
     "electron-updater": "^6.8.3",
+    "jsdom": "^25.0.1",
     "node-machine-id": "^1.1.12",
+    "png-to-ico": "^3.0.1",
     "postcss": "^8.4.49",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.3",
     "vite": "^5.4.11",
@@ -70,7 +73,7 @@
     "productName": "Retaj Store",
     "copyright": "Copyright © 2026 Retaj Store",
     "directories": {
-      "output": "../../dist-electron"
+      "output": "../dist-electron"
     },
     "files": [
       "dist/**/*",
