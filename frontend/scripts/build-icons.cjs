@@ -12,8 +12,8 @@
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
-const pngToIcoMod = require("png-to-ico");
-const pngToIco = pngToIcoMod.default ?? pngToIcoMod;
+// png-to-ico v3 is pure ESM, so importing it from a .cjs file requires a
+// dynamic import. We unwrap the module's default export inside main().
 
 const PUBLIC_DIR = path.resolve(__dirname, "..", "public");
 const SOURCE = path.join(PUBLIC_DIR, "brand", "retaj-icon-source.svg");
@@ -28,6 +28,9 @@ async function main() {
     process.exit(1);
   }
   const svg = fs.readFileSync(SOURCE);
+
+  const pngToIcoMod = await import("png-to-ico");
+  const pngToIco = pngToIcoMod.default ?? pngToIcoMod;
 
   console.log("--> writing 512x512 PNG");
   await sharp(svg).resize(512, 512).png().toFile(PNG_OUT);
