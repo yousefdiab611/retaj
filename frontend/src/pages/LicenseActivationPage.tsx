@@ -2,13 +2,14 @@ import { ShieldCheck, ArrowRight, CheckCircle2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import type { LocalLicenseData } from "@/types/electron";
+
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { activateLicense, validateLicense } from "@/lib/api";
 import { getDeviceFingerprint, getLocalLicense, isDesktopApp, saveLocalLicense } from "@/lib/electron";
-import type { LocalLicenseData } from "@/types/electron";
 
 export function LicenseActivationPage() {
   const navigate = useNavigate();
@@ -123,10 +124,15 @@ export function LicenseActivationPage() {
           <Card>
             <CardHeader>
               <CardTitle>Desktop license activation</CardTitle>
-              <CardDescription>License activation is only available from the Retaj desktop application.</CardDescription>
+              <CardDescription>
+                License activation is only available from the Retaj desktop application.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Please open Retaj POS in the installed desktop application to activate your professional license.</p>
+              <p className="text-sm text-muted-foreground">
+                Please open Retaj POS in the installed desktop application to activate your professional
+                license.
+              </p>
               <div className="mt-6">
                 <Link to="/login" className="text-primary underline">
                   Back to login
@@ -144,16 +150,21 @@ export function LicenseActivationPage() {
       <MainNav />
       <div className="mx-auto max-w-[800px] px-4 py-10">
         <div className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Activate your desktop license</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            Activate your desktop license
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Enter your professional license key to bind this machine and unlock offline grace, device binding, and license enforcement.
+            Enter your professional license key to bind this machine and unlock offline grace, device binding,
+            and license enforcement.
           </p>
         </div>
 
         {localLicense ? (
           <Card className="mb-6 border border-border/80">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">Current desktop license status</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                Current desktop license status
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -167,7 +178,9 @@ export function LicenseActivationPage() {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Expires</div>
-                  <div>{localLicense.expiresAt ? new Date(localLicense.expiresAt).toLocaleDateString() : "Never"}</div>
+                  <div>
+                    {localLicense.expiresAt ? new Date(localLicense.expiresAt).toLocaleDateString() : "Never"}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Device ID</div>
@@ -181,11 +194,23 @@ export function LicenseActivationPage() {
                 ) : null}
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="secondary" onClick={handleValidateExisting} disabled={loading} className="gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleValidateExisting}
+                  disabled={loading}
+                  className="gap-2"
+                >
                   <RefreshCw className="h-4 w-4" />
                   Validate license now
                 </Button>
-                <Button type="button" variant="ghost" onClick={handleClearLocalLicense} disabled={loading} className="gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleClearLocalLicense}
+                  disabled={loading}
+                  className="gap-2"
+                >
                   <ArrowRight className="h-4 w-4" />
                   Clear local license
                 </Button>
@@ -197,7 +222,9 @@ export function LicenseActivationPage() {
         <Card>
           <CardHeader>
             <CardTitle>Activate desktop license</CardTitle>
-            <CardDescription>Use your license key to bind this machine and enable offline grace.</CardDescription>
+            <CardDescription>
+              Use your license key to bind this machine and enable offline grace.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {status ? (
@@ -221,11 +248,25 @@ export function LicenseActivationPage() {
               />
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button type="button" onClick={handleActivate} disabled={loading || !licenseKey.trim()} className="gap-2">
+              <Button
+                type="button"
+                onClick={handleActivate}
+                disabled={loading || !licenseKey.trim()}
+                className="gap-2"
+              >
                 <ShieldCheck className="h-4 w-4" />
                 Activate license
               </Button>
-              <Button type="button" variant="secondary" onClick={() => navigate((location.state as { from?: Location })?.from?.pathname ?? "/pos", { replace: true })} className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() =>
+                  navigate((location.state as { from?: Location })?.from?.pathname ?? "/pos", {
+                    replace: true,
+                  })
+                }
+                className="gap-2"
+              >
                 Back to app
               </Button>
             </div>

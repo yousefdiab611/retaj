@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+
+import type { ReactNode } from "react";
 
 import { validateLicense } from "@/lib/api";
 import { getDeviceFingerprint, getLocalLicense, isDesktopApp, isLocalLicenseValid } from "@/lib/electron";
@@ -66,8 +67,9 @@ export function DesktopLicenseGate({ children }: { children: ReactNode }) {
         if (!mounted) return;
         setAllowed(false);
       } finally {
-        if (!mounted) return;
-        setLicenseChecked(true);
+        if (mounted) {
+          setLicenseChecked(true);
+        }
       }
     }
 

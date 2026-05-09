@@ -85,11 +85,11 @@ log entry per batch.
 
 Three buckets defined in `middleware/rateLimits.ts`:
 
-| Bucket          | Default cap          | Scope                          |
-| --------------- | -------------------- | ------------------------------ |
-| `apiRateLimiter`        | 800 req / 15 min  | All `/api` traffic              |
+| Bucket                      | Default cap         | Scope                                                    |
+| --------------------------- | ------------------- | -------------------------------------------------------- |
+| `apiRateLimiter`            | 800 req / 15 min    | All `/api` traffic                                       |
 | `sensitiveWriteRateLimiter` | 400 writes / 15 min | Stock, inventory, products, transactions, sync, invoices |
-| `refreshRateLimiter`    | 60 / hour         | `POST /api/auth/refresh`        |
+| `refreshRateLimiter`        | 60 / hour           | `POST /api/auth/refresh`                                 |
 
 When `REDIS_URL` is set the buckets are backed by `rate-limit-redis`,
 otherwise they fall back to `express-rate-limit`'s in-memory store

@@ -17,10 +17,7 @@ describe("jwt helpers", () => {
   });
 
   it("rejects tokens with the wrong type claim", () => {
-    const refresh = jwt.sign(
-      { sub: "user-3", typ: "refresh" },
-      process.env.JWT_SECRET as string,
-    );
+    const refresh = jwt.sign({ sub: "user-3", typ: "refresh" }, process.env.JWT_SECRET as string);
     expect(() => verifyAccessToken(refresh)).toThrow(/Invalid token type/);
   });
 

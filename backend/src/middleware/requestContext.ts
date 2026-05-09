@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 
-import type { NextFunction, Request, Response } from "express";
-
 import { logger } from "../lib/logger";
+
+import type { NextFunction, Request, Response } from "express";
 
 const REQUEST_ID_HEADER = "x-request-id";
 

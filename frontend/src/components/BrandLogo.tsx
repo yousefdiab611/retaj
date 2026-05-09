@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { BRAND_LOGO_FALLBACK_SRC, BRAND_LOGO_PRIMARY_SRC } from "@/lib/branding";
+import { BRAND_LOGO_FALLBACK_SRC, BRAND_LOGO_PRIMARY_SRC, BRAND_LOGO_WHITE_SRC } from "@/lib/branding";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
@@ -20,7 +20,11 @@ export function BrandLogo({ className, imgClassName }: BrandLogoProps) {
         loading="eager"
         decoding="async"
         fetchPriority="high"
-        onError={() => setSrc((current) => (current === BRAND_LOGO_PRIMARY_SRC ? BRAND_LOGO_WHITE_SRC : BRAND_LOGO_FALLBACK_SRC))}
+        onError={() =>
+          setSrc((current) =>
+            current === BRAND_LOGO_PRIMARY_SRC ? BRAND_LOGO_WHITE_SRC : BRAND_LOGO_FALLBACK_SRC,
+          )
+        }
       />
     </div>
   );

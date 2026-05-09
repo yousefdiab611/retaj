@@ -22,7 +22,9 @@ export function isDatabaseConnectionError(error: unknown): boolean {
   }
 
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-  return /connection.*refused|could not connect|timed out|p1001|p1010|p1011|p1012|p1013|p1014|p1015/.test(message);
+  return /connection.*refused|could not connect|timed out|p1001|p1010|p1011|p1012|p1013|p1014|p1015/.test(
+    message,
+  );
 }
 
 export function isDatabaseUnavailableError(error: unknown): boolean {

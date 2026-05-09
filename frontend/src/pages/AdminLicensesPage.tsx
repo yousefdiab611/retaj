@@ -1,13 +1,14 @@
-import type { ChangeEvent } from "react";
-import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
+import type { LicenseRow } from "@/types/billing";
+import type { ChangeEvent } from "react";
 
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { fetchAdminLicenses } from "@/lib/api";
-import type { LicenseRow } from "@/types/billing";
 
 export function AdminLicensesPage() {
   const [loading, setLoading] = useState(true);
@@ -44,7 +45,8 @@ export function AdminLicensesPage() {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">License management</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              View and manage licenses for your tenants with activation state, expiry, and device binding details.
+              View and manage licenses for your tenants with activation state, expiry, and device binding
+              details.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -105,7 +107,9 @@ export function AdminLicensesPage() {
                         {license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : "Never"}
                       </td>
                       <td className="py-2 pe-3">{license.deviceId ?? "Unbound"}</td>
-                      <td className="py-2 pe-3 truncate text-xs text-muted-foreground">{license.deviceFingerprint ?? "—"}</td>
+                      <td className="py-2 pe-3 truncate text-xs text-muted-foreground">
+                        {license.deviceFingerprint ?? "—"}
+                      </td>
                       <td className="py-2 tabular-nums text-muted-foreground">
                         {new Date(license.updatedAt).toLocaleString()}
                       </td>

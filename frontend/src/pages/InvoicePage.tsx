@@ -1,19 +1,16 @@
+import { Download, Printer, ArrowLeft, Facebook, Instagram } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Download, Printer, Share2, ArrowLeft, Facebook, Instagram } from "lucide-react";
+
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { fetchTransactionInvoice } from "@/lib/api";
 import { BRAND_LOGO_PRIMARY_SRC, BRAND_LOGO_FALLBACK_SRC } from "@/lib/branding";
 import { generateQrCodeDataUrl } from "@/lib/qr";
-import { cn } from "@/lib/utils";
 
 type Locale = "en" | "ar";
 
-const translations: Record<
-  Locale,
-  Record<string, string>
-> = {
+const translations: Record<Locale, Record<string, string>> = {
   en: {
     invoice: "Invoice",
     invoiceNumber: "Invoice Number",
@@ -149,7 +146,6 @@ export function InvoicePage() {
   }
 
   const isFullyPaid = invoice.remaining === 0;
-  const hasDebt = invoice.remaining > 0;
   const currency = invoice.store.currency ?? "SAR";
   const cashierName = invoice.cashier.name || invoice.cashier.username || "—";
   const customerName = invoice.customer?.name || "—";
@@ -214,9 +210,7 @@ export function InvoicePage() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">التاريخ</p>
-                  <p className="font-semibold">
-                    {new Date(invoice.createdAt).toLocaleDateString("ar-SA")}
-                  </p>
+                  <p className="font-semibold">{new Date(invoice.createdAt).toLocaleDateString("ar-SA")}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -274,8 +268,12 @@ export function InvoicePage() {
                     <tr key={line.id} className="border-b border-border last:border-none">
                       <td className="px-3 py-3 text-right font-medium">{line.name}</td>
                       <td className="px-3 py-3 text-center">{line.quantity}</td>
-                      <td className="px-3 py-3 text-center">{line.unitPrice.toFixed(2)} {currency}</td>
-                      <td className="px-3 py-3 text-left font-semibold">{line.lineTotal.toFixed(2)} {currency}</td>
+                      <td className="px-3 py-3 text-center">
+                        {line.unitPrice.toFixed(2)} {currency}
+                      </td>
+                      <td className="px-3 py-3 text-left font-semibold">
+                        {line.lineTotal.toFixed(2)} {currency}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -285,23 +283,33 @@ export function InvoicePage() {
             <div className="grid gap-3 rounded-3xl border border-border/60 bg-slate-50 p-4 text-sm">
               <div className="flex justify-between gap-4">
                 <span className="text-slate-600">الإجمالي الفرعي</span>
-                <span className="font-semibold">{invoice.subtotal.toFixed(2)} {currency}</span>
+                <span className="font-semibold">
+                  {invoice.subtotal.toFixed(2)} {currency}
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-slate-600">الخصم</span>
-                <span className="font-semibold">-{invoice.discount.toFixed(2)} {currency}</span>
+                <span className="font-semibold">
+                  -{invoice.discount.toFixed(2)} {currency}
+                </span>
               </div>
               <div className="flex justify-between gap-4 border-t border-border pt-3 text-lg font-semibold">
                 <span>إجمالي الفاتورة</span>
-                <span>{invoice.total.toFixed(2)} {currency}</span>
+                <span>
+                  {invoice.total.toFixed(2)} {currency}
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-slate-600">المدفوع</span>
-                <span className="font-semibold">{invoice.paid.toFixed(2)} {currency}</span>
+                <span className="font-semibold">
+                  {invoice.paid.toFixed(2)} {currency}
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-slate-600">المتبقي</span>
-                <span className="font-semibold">{invoice.remaining.toFixed(2)} {currency}</span>
+                <span className="font-semibold">
+                  {invoice.remaining.toFixed(2)} {currency}
+                </span>
               </div>
               {isFullyPaid ? (
                 <div className="rounded-2xl bg-emerald-100 p-3 text-center text-emerald-800">

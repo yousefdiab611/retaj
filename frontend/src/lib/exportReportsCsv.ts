@@ -1,6 +1,6 @@
-import type { ReportSummary, ReportTransactionRow } from "@/lib/api";
-
 import { csvField, downloadTextFile } from "./csv";
+
+import type { ReportSummary, ReportTransactionRow } from "@/lib/api";
 
 export function downloadReportTransactionsCsv(
   rows: ReportTransactionRow[],

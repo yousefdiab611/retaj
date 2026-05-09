@@ -1,4 +1,5 @@
 import { withOfflineStore, getAllFromStore, getFromIndex } from "./db";
+
 import type { Product } from "@/types/product";
 
 export type CachedProductRecord = Product & {
@@ -35,10 +36,7 @@ export async function getCachedProducts(warehouseId?: string): Promise<Product[]
   return rows.map(({ syncedAt, updatedAt, ...product }) => product);
 }
 
-export async function searchCachedProducts(
-  query: string,
-  warehouseId?: string,
-): Promise<Product[]> {
+export async function searchCachedProducts(query: string, warehouseId?: string): Promise<Product[]> {
   const q = query.trim().toLowerCase();
   const rows: CachedProductRecord[] = warehouseId
     ? await getFromIndex<CachedProductRecord>(STORE, "warehouseId", warehouseId)
@@ -84,5 +82,7 @@ export async function getProductCacheTimestamp(warehouseId: string): Promise<num
 }
 
 export async function setProductCacheTimestamp(warehouseId: string, timestamp: number): Promise<void> {
-  await withOfflineStore("sync_meta", "readwrite", (store) => store.put({ key: `productSync_${warehouseId}`, value: timestamp }));
+  await withOfflineStore("sync_meta", "readwrite", (store) =>
+    store.put({ key: `productSync_${warehouseId}`, value: timestamp }),
+  );
 }

@@ -4,13 +4,13 @@ Multi-tenant Point-of-Sale, inventory, billing and licensing platform with
 web, **desktop** (Windows/macOS/Linux via Electron) and mobile (Flutter)
 clients backed by a Node.js + Prisma + PostgreSQL API.
 
-| Workspace          | Stack                                              | Path                |
-| ------------------ | -------------------------------------------------- | ------------------- |
-| API server         | Node 20, Express, Prisma, Zod, pino, JWT, helmet   | `backend/`          |
-| Web + desktop UI   | React 18, Vite, Tailwind, Radix, Electron 28       | `frontend/`         |
-| Mobile cashier     | Flutter 3, sqflite, secure_storage                 | `mobile_cashier/`   |
-| Containers         | Docker (api + web), docker-compose for the stack   | `infra/`, `*/Dockerfile` |
-| CI / release       | GitHub Actions (CI, CodeQL, desktop release)       | `.github/`          |
+| Workspace        | Stack                                            | Path                     |
+| ---------------- | ------------------------------------------------ | ------------------------ |
+| API server       | Node 20, Express, Prisma, Zod, pino, JWT, helmet | `backend/`               |
+| Web + desktop UI | React 18, Vite, Tailwind, Radix, Electron 28     | `frontend/`              |
+| Mobile cashier   | Flutter 3, sqflite, secure_storage               | `mobile_cashier/`        |
+| Containers       | Docker (api + web), docker-compose for the stack | `infra/`, `*/Dockerfile` |
+| CI / release     | GitHub Actions (CI, CodeQL, desktop release)     | `.github/`               |
 
 ## Quick start (local development)
 

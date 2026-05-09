@@ -1,13 +1,14 @@
-import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 import { AuditActions } from "../constants/auditActions";
 import { signAccessToken } from "../lib/jwt";
+import { logger } from "../lib/logger";
+import { reportLoginFailure, reportLoginSuccess } from "../lib/loginBlocker";
 import { prisma } from "../lib/prisma";
 import { generateOpaqueToken, hashOpaqueToken } from "../lib/tokenCrypto";
+
 import { writeAuditLog } from "./audit.service";
-import { reportLoginFailure, reportLoginSuccess } from "../lib/loginBlocker";
-import { logger } from "../lib/logger";
 
 function refreshExpiresAt(): Date {
   const days = Number(process.env.JWT_REFRESH_DAYS ?? "14");
@@ -282,4 +283,3 @@ export async function logoutRefreshToken(
     userAgent: meta.userAgent,
   });
 }
-

@@ -1,4 +1,5 @@
 import jwt, { type Secret, type SignOptions } from "jsonwebtoken";
+
 import type { StringValue } from "ms";
 
 const getSecret = (): string => {

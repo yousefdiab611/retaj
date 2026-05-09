@@ -48,12 +48,12 @@ The repository ships with the following defaults:
 
 ## Secret rotation
 
-| Secret                   | How to rotate                                               |
-| ------------------------ | ----------------------------------------------------------- |
-| `JWT_SECRET`             | Generate via `openssl rand -base64 48`. Restart the API. All issued access tokens become invalid; clients must log in again. |
-| `STRIPE_SECRET_KEY`      | Roll the key in the Stripe dashboard, redeploy with the new value. |
-| `STRIPE_WEBHOOK_SECRET`  | Update the endpoint in Stripe → copy new signing secret → redeploy. |
-| Database password        | Update the role in PostgreSQL, redeploy with new `DATABASE_URL`. |
+| Secret                   | How to rotate                                                                                                                                 |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_SECRET`             | Generate via `openssl rand -base64 48`. Restart the API. All issued access tokens become invalid; clients must log in again.                  |
+| `STRIPE_SECRET_KEY`      | Roll the key in the Stripe dashboard, redeploy with the new value.                                                                            |
+| `STRIPE_WEBHOOK_SECRET`  | Update the endpoint in Stripe → copy new signing secret → redeploy.                                                                           |
+| Database password        | Update the role in PostgreSQL, redeploy with new `DATABASE_URL`.                                                                              |
 | Code-signing certificate | macOS: rotate Developer ID via App Store Connect. Windows: rotate EV cert with the CA. Update `CSC_LINK` / `CSC_KEY_PASSWORD` GitHub secrets. |
 
 ## Audit logs

@@ -1,8 +1,8 @@
+import { UserRole } from "@prisma/client";
 import { Router } from "express";
 
 import { licenseController } from "../controllers/licenseController";
 import { requireRole } from "../middleware/requireRole";
-import { UserRole } from "@prisma/client";
 
 export const publicLicenseRouter = Router();
 export const licenseRouter = Router();

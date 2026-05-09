@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 
 /** Browser online/offline (also true when `navigator.onLine` is unreliable until events fire). */
 export function useOnlineStatus(): boolean {
-  const [online, setOnline] = useState(() =>
-    typeof navigator === "undefined" ? true : navigator.onLine,
-  );
+  const [online, setOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine));
 
   useEffect(() => {
     const on = () => setOnline(true);

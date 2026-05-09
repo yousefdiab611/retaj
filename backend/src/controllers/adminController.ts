@@ -1,11 +1,12 @@
-import type { Request, Response } from "express";
 import { LicenseStatus, PaymentStatus, Prisma } from "@prisma/client";
 
-import { createLicenseRecord } from "../services/license.service";
+import { AuditActions } from "../constants/auditActions";
+import { getDatabaseStatus } from "../lib/dbBootstrap";
 import { prisma } from "../lib/prisma";
 import { writeAuditLog } from "../services/audit.service";
-import { getDatabaseStatus } from "../lib/dbBootstrap";
-import { AuditActions } from "../constants/auditActions";
+import { createLicenseRecord } from "../services/license.service";
+
+import type { Request, Response } from "express";
 
 function parsePositiveInteger(value: string | string[] | undefined, fallback: number) {
   const parsed = Number(value);
@@ -29,7 +30,20 @@ export const adminController = {
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
 
-    const [customers, activeSubscriptions, activeLicenses, expiredLicenses, revenue, failedLogins, todayOrders, todayRevenue, pendingOfflineQueue, lastOfflineSync, newCustomers, tenant] = await Promise.all([
+    const [
+      customers,
+      activeSubscriptions,
+      activeLicenses,
+      expiredLicenses,
+      revenue,
+      failedLogins,
+      todayOrders,
+      todayRevenue,
+      pendingOfflineQueue,
+      lastOfflineSync,
+      newCustomers,
+      tenant,
+    ] = await Promise.all([
       prisma.customer.count({ where: { tenantId } }),
       prisma.subscription.count({ where: { tenantId, status: "ACTIVE" } }),
       prisma.license.count({ where: { tenantId, status: LicenseStatus.ACTIVE } }),
@@ -51,7 +65,10 @@ export const adminController = {
         select: { createdAt: true },
       }),
       prisma.customer.count({ where: { tenantId, createdAt: { gte: todayStart } } }),
-      prisma.tenant.findUnique({ where: { id: tenantId }, select: { plan: true, billingStatus: true, planExpiresAt: true } }),
+      prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: { plan: true, billingStatus: true, planExpiresAt: true },
+      }),
     ]);
 
     const topProductsRaw = await prisma.transactionLine.groupBy({
@@ -223,8 +240,13 @@ export const adminController = {
       return;
     }
 
-    const nextExpiry = license.expiresAt ? new Date(license.expiresAt.getTime() + expiresInDays * 24 * 60 * 60 * 1000) : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
-    const updated = await prisma.license.update({ where: { id: licenseId }, data: { expiresAt: nextExpiry, status: LicenseStatus.ACTIVE } });
+    const nextExpiry = license.expiresAt
+      ? new Date(license.expiresAt.getTime() + expiresInDays * 24 * 60 * 60 * 1000)
+      : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
+    const updated = await prisma.license.update({
+      where: { id: licenseId },
+      data: { expiresAt: nextExpiry, status: LicenseStatus.ACTIVE },
+    });
 
     await writeAuditLog({
       action: AuditActions.LICENSE_GENERATED,

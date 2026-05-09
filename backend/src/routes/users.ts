@@ -2,11 +2,11 @@ import { Prisma } from "@prisma/client";
 import { Router } from "express";
 
 import { AuditActions } from "../constants/auditActions";
+import { logger } from "../lib/logger";
 import { writeAuditLog } from "../services/audit.service";
 import { listUsersForAdmin, updateUserByAdmin } from "../services/userAdmin.service";
 import { getClientIp, getUserAgent, firstPathParam } from "../utils/requestMeta";
 import { patchUserBodySchema } from "../validation/schemas";
-import { logger } from "../lib/logger";
 
 export const usersRouter = Router();
 

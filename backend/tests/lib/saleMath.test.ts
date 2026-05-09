@@ -57,12 +57,12 @@ describe("computeSaleTotals", () => {
   });
 
   it("rejects negative quantities, prices, discounts and payments", () => {
-    expect(() =>
-      computeSaleTotals({ lines: [{ quantity: -1, unitPrice: 10 }], taxRate: 0.15 }),
-    ).toThrow(/quantity/);
-    expect(() =>
-      computeSaleTotals({ lines: [{ quantity: 1, unitPrice: -5 }], taxRate: 0.15 }),
-    ).toThrow(/unit_price/);
+    expect(() => computeSaleTotals({ lines: [{ quantity: -1, unitPrice: 10 }], taxRate: 0.15 })).toThrow(
+      /quantity/,
+    );
+    expect(() => computeSaleTotals({ lines: [{ quantity: 1, unitPrice: -5 }], taxRate: 0.15 })).toThrow(
+      /unit_price/,
+    );
     expect(() =>
       computeSaleTotals({
         lines: [{ quantity: 1, unitPrice: 100 }],

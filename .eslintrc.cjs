@@ -64,6 +64,10 @@ module.exports = {
       },
     ],
     "import/no-duplicates": "error",
+    // false positives on CJS packages re-exported through esModuleInterop
+    "import/default": "off",
+    "import/no-named-as-default-member": "off",
+    "import/namespace": "off",
     "no-console": ["warn", { allow: ["warn", "error", "info"] }],
     eqeqeq: ["error", "smart"],
     "no-var": "error",
@@ -75,6 +79,14 @@ module.exports = {
       env: { jest: true },
       rules: {
         "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
+    {
+      // CommonJS config files legitimately use require().
+      files: ["**/*.cjs", "**/.eslintrc.cjs", "**/commitlint.config.cjs"],
+      rules: {
+        "@typescript-eslint/no-require-imports": "off",
+        "@typescript-eslint/no-var-requires": "off",
       },
     },
   ],

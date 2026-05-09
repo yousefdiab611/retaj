@@ -3,23 +3,27 @@
 ## 🎯 TL;DR - Get Running in 5 Minutes
 
 ### Step 1: Setup Database (First Time Only)
+
 ```sql
 CREATE USER retaj_user WITH PASSWORD 'RetajPass123!';
 CREATE DATABASE retaj_db OWNER retaj_user;
 ```
 
 ### Step 2: Run Everything
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1
 ```
 
 ### Step 3: Install Desktop App
+
 - Find the installer: `d:\retaj\dist-electron\RetajPOS Setup X.X.X.exe`
 - Run the installer as administrator
 - The desktop app will handle everything automatically
 
 ### Step 4: Login
+
 - **Username:** `ahmed`
 - **Password:** `ahmed123`
 
@@ -29,12 +33,12 @@ cd d:\retaj
 
 ### Main Build System (All Platforms)
 
-| Platform | Command |
-|----------|---------|
-| Windows (PowerShell) | `.\run-all.ps1` |
-| Windows (Batch) | `run-all.bat` |
-| macOS/Linux (Bash) | `./run-all.sh` |
-| Skip Mobile | `.\run-all.ps1 -SkipMobile` |
+| Platform             | Command                     |
+| -------------------- | --------------------------- |
+| Windows (PowerShell) | `.\run-all.ps1`             |
+| Windows (Batch)      | `run-all.bat`               |
+| macOS/Linux (Bash)   | `./run-all.sh`              |
+| Skip Mobile          | `.\run-all.ps1 -SkipMobile` |
 
 ### Development Servers
 
@@ -82,10 +86,10 @@ cd mobile_cashier && flutter build apk --release
 
 After running `npm run db:seed`:
 
-| User | Password | Role |
-|------|----------|------|
+| User    | Password   | Role        |
+| ------- | ---------- | ----------- |
 | `ahmed` | `ahmed123` | Full Access |
-| `ahmed` | `ahmed123` | POS Only |
+| `ahmed` | `ahmed123` | POS Only    |
 
 ---
 
@@ -104,13 +108,13 @@ d:\retaj/
 
 ## ❓ Common Issues
 
-| Issue | Solution |
-|-------|----------|
+| Issue                        | Solution                                        |
+| ---------------------------- | ----------------------------------------------- |
 | "Cannot connect to database" | Ensure PostgreSQL is running, check credentials |
-| "Login failed" | Run `npm run db:seed` to create test users |
-| "Frontend can't reach API" | Check backend is running on port 3001 |
-| "npm command not found" | Install Node.js 18+ |
-| "Flutter not found" | Install Flutter or use `-SkipMobile` flag |
+| "Login failed"               | Run `npm run db:seed` to create test users      |
+| "Frontend can't reach API"   | Check backend is running on port 3001           |
+| "npm command not found"      | Install Node.js 18+                             |
+| "Flutter not found"          | Install Flutter or use `-SkipMobile` flag       |
 
 ---
 

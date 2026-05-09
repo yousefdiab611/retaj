@@ -115,9 +115,15 @@ openApiRegistry.registerPath({
   },
   responses: {
     201: { description: "Sale created", content: { "application/json": { schema: SaleResponse } } },
-    400: { description: "Validation or business error", content: { "application/json": { schema: ErrorResponse } } },
+    400: {
+      description: "Validation or business error",
+      content: { "application/json": { schema: ErrorResponse } },
+    },
     401: { description: "Unauthorised", content: { "application/json": { schema: ErrorResponse } } },
-    409: { description: "Stock race or idempotency conflict", content: { "application/json": { schema: ErrorResponse } } },
+    409: {
+      description: "Stock race or idempotency conflict",
+      content: { "application/json": { schema: ErrorResponse } },
+    },
   },
 });
 
@@ -130,7 +136,10 @@ openApiRegistry.registerPath({
     body: { content: { "application/json": { schema: offlineSyncBodySchema } } },
   },
   responses: {
-    200: { description: "Batch processed", content: { "application/json": { schema: z.object({ results: z.array(z.unknown()) }) } } },
+    200: {
+      description: "Batch processed",
+      content: { "application/json": { schema: z.object({ results: z.array(z.unknown()) }) } },
+    },
   },
 });
 

@@ -1,6 +1,6 @@
-import type { RedisClientType } from "redis";
-
 import { logger } from "./logger";
+
+import type { RedisClientType } from "redis";
 
 let client: RedisClientType | null = null;
 let connecting: Promise<RedisClientType | null> | null = null;

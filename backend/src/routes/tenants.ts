@@ -54,8 +54,8 @@ tenantsRouter.patch("/:id", async (req, res) => {
         parsed.data.planExpiresAt === undefined
           ? undefined
           : parsed.data.planExpiresAt
-          ? new Date(parsed.data.planExpiresAt)
-          : null,
+            ? new Date(parsed.data.planExpiresAt)
+            : null,
     };
     const tenant = await updateTenant(id, payload);
     res.json({ tenant });

@@ -39,15 +39,21 @@ transactionsRouter.post("/", async (req, res) => {
       return;
     }
     if (result.code === "CUSTOMER_REQUIRED") {
-      res.status(400).json({ error: "Customer is required for account or partial payment", code: "CUSTOMER_REQUIRED" });
+      res
+        .status(400)
+        .json({ error: "Customer is required for account or partial payment", code: "CUSTOMER_REQUIRED" });
       return;
     }
     if (result.code === "INVALID_PRODUCT") {
-      res.status(400).json({ error: "One or more products are invalid or inactive", code: "INVALID_PRODUCT" });
+      res
+        .status(400)
+        .json({ error: "One or more products are invalid or inactive", code: "INVALID_PRODUCT" });
       return;
     }
     if (result.code === "INSUFFICIENT_STOCK") {
-      res.status(400).json({ error: "Insufficient stock for one or more products", code: "INSUFFICIENT_STOCK" });
+      res
+        .status(400)
+        .json({ error: "Insufficient stock for one or more products", code: "INSUFFICIENT_STOCK" });
       return;
     }
     if (result.code === "INVALID_WAREHOUSE") {
@@ -81,7 +87,13 @@ transactionsRouter.get("/:id", async (req, res) => {
   }
 
   const id = firstPathParam(req.params.id);
-  const data = await getTransactionForInvoice(id, userId, role, req.userBranchId ?? null, req.userTenantId ?? "");
+  const data = await getTransactionForInvoice(
+    id,
+    userId,
+    role,
+    req.userBranchId ?? null,
+    req.userTenantId ?? "",
+  );
   if (!data) {
     res.status(404).json({ error: "Transaction not found", code: "NOT_FOUND" });
     return;

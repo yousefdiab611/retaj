@@ -91,7 +91,14 @@ export function TenantsPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void loadTenants()} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => void loadTenants()}
+              disabled={loading}
+            >
               <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
               Refresh
             </Button>
@@ -141,7 +148,9 @@ export function TenantsPage() {
         </div>
 
         {error ? (
-          <p className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+          <p className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </p>
         ) : null}
 
         <Card>
@@ -280,7 +289,11 @@ export function TenantsPage() {
                 Close
               </Button>
               {selectedTenant ? (
-                <Button type="button" disabled={saving} onClick={() => void toggleTenantActive(selectedTenant)}>
+                <Button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void toggleTenantActive(selectedTenant)}
+                >
                   {selectedTenant.isActive ? "Suspend tenant" : "Activate tenant"}
                 </Button>
               ) : null}

@@ -21,9 +21,7 @@ describe("requestContext middleware", () => {
     expect(res.body.pong).toBe(true);
     expect(res.body.requestId).toBeTruthy();
     expect(res.headers["x-request-id"]).toBe(res.body.requestId);
-    expect(res.body.requestId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-    );
+    expect(res.body.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
   });
 
   it("respects an upstream x-request-id header when it is well-formed", async () => {

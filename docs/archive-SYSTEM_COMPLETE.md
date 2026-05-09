@@ -11,6 +11,7 @@ The complete automated build system for Retaj Store has been created and tested.
 ### 1. **Build Automation Scripts**
 
 #### PowerShell (Windows - Recommended)
+
 - **File:** `run-all.ps1`
 - **Features:**
   - ✅ Colored output (green=success, red=error, cyan=info)
@@ -21,12 +22,14 @@ The complete automated build system for Retaj Store has been created and tested.
   - ✅ `-SkipMobile` flag for faster builds
 
 **Usage:**
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1
 ```
 
 #### Batch Script (Windows - Fallback)
+
 - **File:** `run-all.bat`
 - **Features:**
   - ✅ Command Prompt compatible
@@ -35,12 +38,14 @@ cd d:\retaj
   - ✅ Error checking per module
 
 **Usage:**
+
 ```cmd
 cd d:\retaj
 run-all.bat
 ```
 
 #### Bash Script (macOS/Linux)
+
 - **File:** `run-all.sh`
 - **Features:**
   - ✅ Full color support
@@ -49,6 +54,7 @@ run-all.bat
   - ✅ Module status summary
 
 **Usage:**
+
 ```bash
 cd ~/retaj
 chmod +x run-all.sh
@@ -60,6 +66,7 @@ chmod +x run-all.sh
 ### 2. **Environment Configuration Files**
 
 #### Backend Environment
+
 - **File:** `backend/.env`
 - **Configured:**
   - ✅ PostgreSQL connection
@@ -69,6 +76,7 @@ chmod +x run-all.sh
   - ✅ Store branding
 
 #### Frontend Environment
+
 - **File:** `frontend/.env`
 - **Configured:**
   - ✅ API URL (uses Vite proxy by default)
@@ -78,7 +86,9 @@ chmod +x run-all.sh
 ### 3. **Documentation**
 
 #### RUN_SYSTEM_README.md
+
 Complete documentation including:
+
 - ✅ Prerequisites and setup
 - ✅ Database setup instructions
 - ✅ Platform-specific run commands
@@ -89,7 +99,9 @@ Complete documentation including:
 - ✅ Execution time estimates
 
 #### CREDENTIALS_AND_SETUP.md
+
 Full setup and credentials guide including:
+
 - ✅ Database creation scripts
 - ✅ Test user credentials
 - ✅ Login instructions
@@ -98,7 +110,9 @@ Full setup and credentials guide including:
 - ✅ Troubleshooting database issues
 
 #### QUICK_START.md
+
 Fast reference guide:
+
 - ✅ 5-minute setup
 - ✅ Command reference
 - ✅ Common issues & solutions
@@ -109,24 +123,28 @@ Fast reference guide:
 ## 🚀 Quick Start
 
 ### 1. Create Database (First Time)
+
 ```sql
 CREATE USER retaj_user WITH PASSWORD 'RetajPass123!';
 CREATE DATABASE retaj_db OWNER retaj_user;
 ```
 
 ### 2. Run Build System
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1
 ```
 
 ### 3. Seed Test Data
+
 ```bash
 cd d:\retaj\backend
 npm run db:seed
 ```
 
 ### 4. Start Development
+
 ```bash
 # Terminal 1
 cd d:\retaj\backend && npm run dev
@@ -136,6 +154,7 @@ cd d:\retaj\frontend && npm run dev
 ```
 
 ### 5. Login
+
 - **URL:** http://localhost:5173
 - **Username:** `admin`
 - **Password:** `ahmed123`
@@ -197,10 +216,10 @@ cd d:\retaj\frontend && npm run dev
 
 ### Default Users (After `npm run db:seed`)
 
-| Username | Password | Role | Purpose |
-|----------|----------|------|---------|
-| `ahmed` | `ahmed123` | ADMIN | System administration, user management |
-| `ahmed` | `ahmed123` | CASHIER | Point of Sale (POS) operations |
+| Username | Password   | Role    | Purpose                                |
+| -------- | ---------- | ------- | -------------------------------------- |
+| `ahmed`  | `ahmed123` | ADMIN   | System administration, user management |
+| `ahmed`  | `ahmed123` | CASHIER | Point of Sale (POS) operations         |
 
 ---
 
@@ -239,33 +258,39 @@ d:\retaj/
 ## ✨ Key Features
 
 ✅ **One Command Build**
+
 - Builds backend, frontend, and mobile in one command
 - No manual step coordination needed
 
 ✅ **Error Resilience**
+
 - Individual module failures don't stop entire process
 - Clear error reporting per module
 - Build summary shows success/failure status
 
 ✅ **Clear Output**
+
 - Color-coded messages (green/red/cyan)
 - Step-by-step progress indication
 - Execution time tracking
 - Output path display
 
 ✅ **Production Ready**
+
 - Proper environment configuration
 - Security best practices
 - Database setup documentation
 - Comprehensive error handling
 
 ✅ **Cross-Platform**
+
 - Windows PowerShell (primary)
 - Windows Batch (fallback)
 - Linux/macOS Bash
 - No platform-specific dependencies
 
 ✅ **No Breaking Changes**
+
 - Pure automation layer
 - No business logic modifications
 - All existing features preserved
@@ -276,6 +301,7 @@ d:\retaj/
 ## 🎯 What Each Script Does
 
 ### Backend Build
+
 ```
 1. npm install
 2. npx prisma generate
@@ -284,6 +310,7 @@ Output: backend/dist/
 ```
 
 ### Frontend Build
+
 ```
 1. npm install
 2. npm run build (React + Vite bundling)
@@ -291,6 +318,7 @@ Output: frontend/dist/
 ```
 
 ### Mobile Build (Optional)
+
 ```
 1. flutter pub get
 2. flutter build apk --release
@@ -302,12 +330,14 @@ Output: mobile_cashier/build/app/outputs/flutter-apk/
 ## 📈 Performance
 
 ### Typical Build Times
+
 - **Backend:** 30-60 seconds
 - **Frontend:** 20-40 seconds
 - **Mobile:** 5-10 minutes (optional)
 - **Total:** ~2-3 minutes (without mobile)
 
 ### Tested Configuration
+
 - Windows 10/11 with PowerShell
 - Node.js 18+
 - PostgreSQL 12+
@@ -317,24 +347,31 @@ Output: mobile_cashier/build/app/outputs/flutter-apk/
 ## 🔧 Customization
 
 ### Skip Mobile Build (Faster)
+
 ```powershell
 .\run-all.ps1 -SkipMobile
 ```
 
 ### Change Database Credentials
+
 Edit `backend/.env`:
+
 ```dotenv
 DATABASE_URL="postgresql://username:password@host:port/database"
 ```
 
 ### Change API Port
+
 Edit `backend/.env`:
+
 ```dotenv
 PORT=3001
 ```
 
 ### Add CORS Origins
+
 Edit `backend/.env`:
+
 ```dotenv
 ALLOWED_ORIGINS="http://localhost:5173,http://other-origin.com"
 ```
@@ -344,32 +381,40 @@ ALLOWED_ORIGINS="http://localhost:5173,http://other-origin.com"
 ## 🐛 Troubleshooting
 
 ### Database Connection Error
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:5432
 ```
+
 - Ensure PostgreSQL is running
 - Verify credentials in `backend/.env`
 - Test: `psql -U retaj_user -d retaj_db -h localhost`
 
 ### Login Failed
+
 ```
 Error: Invalid credentials
 ```
+
 - Run: `npm run db:seed` to create test users
 - Check Prisma Studio: `npm run db:studio`
 
 ### Frontend Can't Reach API
+
 ```
 Error: Failed to fetch /api
 ```
+
 - Ensure backend running: `npm run dev` in backend folder
 - Check `ALLOWED_ORIGINS` includes frontend URL
 - Verify port 3001 is accessible
 
 ### Build Script Won't Run
+
 ```
 Error: PowerShell execution policy
 ```
+
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
 ```
@@ -404,22 +449,25 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
 ## 🎓 Next Steps
 
 1. **First Run:**
+
    ```powershell
    cd d:\retaj
    .\run-all.ps1
    ```
 
 2. **Seed Test Data:**
+
    ```bash
    cd backend
    npm run db:seed
    ```
 
 3. **Start Development:**
+
    ```bash
    # Terminal 1
    cd backend && npm run dev
-   
+
    # Terminal 2
    cd frontend && npm run dev
    ```
@@ -446,9 +494,10 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
 **Created:** April 24, 2026  
 **Status:** ✅ Production Ready  
 **Last Tested:** April 24, 2026 05:51:02  
-**Execution Time:** 18.58 seconds  
+**Execution Time:** 18.58 seconds
 
 **Platforms Supported:**
+
 - Windows (PowerShell 5.1+)
 - Windows (Command Prompt)
 - macOS (Bash)
@@ -459,6 +508,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
 ## 🏁 Summary
 
 You now have a complete, automated build system that:
+
 - ✅ Builds all modules in one command
 - ✅ Handles errors gracefully
 - ✅ Provides clear feedback
@@ -467,6 +517,7 @@ You now have a complete, automated build system that:
 - ✅ Requires no manual coordination
 
 **Run the system:**
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1

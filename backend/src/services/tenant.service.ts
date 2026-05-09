@@ -1,5 +1,8 @@
-import { BillingStatus, SubscriptionPlan } from "@prisma/client";
+import { SubscriptionPlan } from "@prisma/client";
+
 import { prisma } from "../lib/prisma";
+
+import type { BillingStatus } from "@prisma/client";
 
 export type TenantRow = {
   id: string;

@@ -1,5 +1,6 @@
-import type { PaymentMethod } from "@/lib/api";
 import { withOfflineStore, getAllFromStore } from "./db";
+
+import type { PaymentMethod } from "@/lib/api";
 
 const STORE = "pending_sales";
 
@@ -38,7 +39,9 @@ export async function updatePendingSaleRetry(
   idempotencyKey: string,
   patch: { lastError?: string; nextRetryAt?: number },
 ): Promise<void> {
-  const row = await withOfflineStore<PendingSaleRecord | undefined>(STORE, "readonly", (store) => store.get(idempotencyKey));
+  const row = await withOfflineStore<PendingSaleRecord | undefined>(STORE, "readonly", (store) =>
+    store.get(idempotencyKey),
+  );
   if (!row) return;
   await withOfflineStore("pending_sales", "readwrite", (store) => store.put({ ...row, ...patch }));
 }

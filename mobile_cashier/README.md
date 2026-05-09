@@ -26,11 +26,11 @@ Then apply platform permissions:
 
 ## API base URL
 
-| Environment | Typical base URL |
-|-------------|-------------------|
-| Android emulator | `http://10.0.2.2:3001` (default in app) |
-| iOS Simulator | `http://127.0.0.1:3001` (default) |
-| Physical device | Your machine’s LAN IP, e.g. `http://192.168.1.10:3001` |
+| Environment      | Typical base URL                                       |
+| ---------------- | ------------------------------------------------------ |
+| Android emulator | `http://10.0.2.2:3001` (default in app)                |
+| iOS Simulator    | `http://127.0.0.1:3001` (default)                      |
+| Physical device  | Your machine’s LAN IP, e.g. `http://192.168.1.10:3001` |
 
 Override in **Settings** inside the app, or at build time:
 
@@ -42,16 +42,16 @@ All requests use paths under `/api` (e.g. `/api/auth/login`, `/api/products`).
 
 ## Backend integration (read-only contract)
 
-| Feature | Endpoint |
-|---------|----------|
-| Login | `POST /api/auth/login` |
-| Refresh | `POST /api/auth/refresh` |
-| Logout | `POST /api/auth/logout` |
-| Products | `GET /api/products?warehouseId=` |
-| Lookup | `GET /api/products/lookup?code=&warehouseId=` |
-| Warehouses | `GET /api/warehouses` |
-| Checkout | `POST /api/transactions` |
-| Receipt / invoice | `GET /api/transactions/:id` |
+| Feature           | Endpoint                                      |
+| ----------------- | --------------------------------------------- |
+| Login             | `POST /api/auth/login`                        |
+| Refresh           | `POST /api/auth/refresh`                      |
+| Logout            | `POST /api/auth/logout`                       |
+| Products          | `GET /api/products?warehouseId=`              |
+| Lookup            | `GET /api/products/lookup?code=&warehouseId=` |
+| Warehouses        | `GET /api/warehouses`                         |
+| Checkout          | `POST /api/transactions`                      |
+| Receipt / invoice | `GET /api/transactions/:id`                   |
 
 Branch context: **`X-Branch-Id`** is sent automatically from the logged-in cashier’s `branchId` (same as the web POS).
 

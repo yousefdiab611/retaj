@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+
 import { prisma } from "../lib/prisma";
 
 export interface QRCodeData {
@@ -94,9 +95,7 @@ export async function generateThermalReceiptQRCode(data: QRCodeData): Promise<st
 /**
  * Verify QR code data (for customer verification)
  */
-export function parseQRCodeData(
-  qrContent: string,
-): QRCodeData | null {
+export function parseQRCodeData(qrContent: string): QRCodeData | null {
   try {
     const data = JSON.parse(qrContent);
     if (data.type === "invoice") {

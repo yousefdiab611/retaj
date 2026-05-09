@@ -4,12 +4,13 @@ import { AuditActions } from "../constants/auditActions";
 import { TAX_RATE } from "../lib/constants";
 import { toDecimalString, roundMoney2 } from "../lib/money";
 import { prisma } from "../lib/prisma";
-import { writeAuditLog } from "./audit.service";
-import { resolveWarehouseIdForSale } from "./inventory/warehouse.service";
-import { syncProductTotalStock } from "./inventory/stockSync.service";
-import type { z } from "zod";
 
-import { createSaleBodySchema } from "../validation/schemas";
+import { writeAuditLog } from "./audit.service";
+import { syncProductTotalStock } from "./inventory/stockSync.service";
+import { resolveWarehouseIdForSale } from "./inventory/warehouse.service";
+
+import type { createSaleBodySchema } from "../validation/schemas";
+import type { z } from "zod";
 
 type SaleInput = z.infer<typeof createSaleBodySchema>;
 
@@ -81,7 +82,7 @@ export async function createSaleTransaction(
   }
 
   const { paymentMethod, lineItems } = parsed;
-  let discount = roundMoney2(parsed.discount ?? 0);
+  const discount = roundMoney2(parsed.discount ?? 0);
   const paidAmount = roundMoney2(parsed.paidAmount ?? 0);
 
   let warehouseId: string;
@@ -102,7 +103,9 @@ export async function createSaleTransaction(
   const customerIdRaw = parsed.customerId;
   let customerId: string | null = null;
   if (customerIdRaw !== undefined && customerIdRaw !== null && customerIdRaw !== "") {
-    const c = await prisma.customer.findFirst({ where: { id: customerIdRaw, tenantId: branchMeta.tenantId } });
+    const c = await prisma.customer.findFirst({
+      where: { id: customerIdRaw, tenantId: branchMeta.tenantId },
+    });
     if (!c) {
       return { ok: false, code: "CUSTOMER_NOT_FOUND" };
     }
@@ -132,7 +135,9 @@ export async function createSaleTransaction(
       });
       const variantById = new Map(variants.map((v) => [v.id, v]));
 
-      const invalidVariant = lineItems.some((item) => item.productVariantId && !variantById.has(item.productVariantId));
+      const invalidVariant = lineItems.some(
+        (item) => item.productVariantId && !variantById.has(item.productVariantId),
+      );
       if (invalidVariant) {
         throw new Error("INVALID_VARIANT");
       }
@@ -191,7 +196,10 @@ export async function createSaleTransaction(
         throw new Error("CUSTOMER_REQUIRED");
       }
 
-      const branch = await tx.branch.findUniqueOrThrow({ where: { id: branchId }, select: { tenantId: true } });
+      const branch = await tx.branch.findUniqueOrThrow({
+        where: { id: branchId },
+        select: { tenantId: true },
+      });
       const sale = await tx.transaction.create({
         data: {
           branchId,

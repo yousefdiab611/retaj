@@ -1,6 +1,6 @@
-import type { Request, Response, NextFunction } from "express";
-
 import { tenantUsageStatus } from "../lib/subscription";
+
+import type { Request, Response, NextFunction } from "express";
 
 export async function requireTenantBillingActive(req: Request, res: Response, next: NextFunction) {
   const tenantId = req.userTenantId;
@@ -16,7 +16,9 @@ export async function requireTenantBillingActive(req: Request, res: Response, ne
   }
 
   if (!status.active) {
-    res.status(403).json({ error: "Your subscription is expired or restricted", code: "TENANT_BILLING_RESTRICTED" });
+    res
+      .status(403)
+      .json({ error: "Your subscription is expired or restricted", code: "TENANT_BILLING_RESTRICTED" });
     return;
   }
 

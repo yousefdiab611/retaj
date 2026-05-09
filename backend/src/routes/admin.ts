@@ -1,5 +1,5 @@
-import { Router } from "express";
 import { UserRole } from "@prisma/client";
+import { Router } from "express";
 
 import { adminController } from "../controllers/adminController";
 import { requireRole } from "../middleware/requireRole";

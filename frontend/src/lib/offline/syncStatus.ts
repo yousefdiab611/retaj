@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { countPendingSales } from "./pendingSalesDb";
+
 import { countDirtyOfflineCustomers } from "./customersDb";
+import { countPendingSales } from "./pendingSalesDb";
 import { getLastSyncAt } from "./syncMeta";
 
 export function useOfflineSyncStatus() {

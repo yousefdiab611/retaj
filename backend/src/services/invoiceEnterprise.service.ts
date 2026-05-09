@@ -1,6 +1,7 @@
-import { prisma } from "../lib/prisma";
-import { roundMoney2 } from "../lib/money";
 import { Decimal } from "@prisma/client/runtime/library";
+
+import { roundMoney2 } from "../lib/money";
+import { prisma } from "../lib/prisma";
 
 // Get latest 5 transactions for statement
 export async function getCustomerRecentTransactions(customerId: string, limit = 5) {
@@ -52,7 +53,7 @@ export async function calculateInvoicePayments(
 
   // Calculate remaining amount
   let remainingAmount = Math.max(0, invoiceTotal - paidAmount);
-  
+
   // If customer is cash customer, no balance tracking
   if (isActuallyCash) {
     remainingAmount = 0;
@@ -71,10 +72,7 @@ export async function calculateInvoicePayments(
 }
 
 // Calculate loyalty points earned from transaction
-export function calculateLoyaltyPointsEarned(
-  transactionTotal: number,
-  loyaltyPointRate: number = 1,
-): number {
+export function calculateLoyaltyPointsEarned(transactionTotal: number, loyaltyPointRate: number = 1): number {
   // 1 point per X SAR (default 1 point per 1 SAR)
   const pointsEarned = Math.floor(transactionTotal / loyaltyPointRate);
   return Math.max(0, pointsEarned);
@@ -141,17 +139,10 @@ export async function createOrUpdateInvoice(
   const loyaltyPointRate = tenant?.loyaltyPointRate || 1;
 
   // Calculate all payment fields
-  const payments = await calculateInvoicePayments(
-    customerId,
-    data.invoiceTotal,
-    data.paidAmount,
-  );
+  const payments = await calculateInvoicePayments(customerId, data.invoiceTotal, data.paidAmount);
 
   // Calculate loyalty points
-  const loyaltyPointsEarned = calculateLoyaltyPointsEarned(
-    data.invoiceTotal,
-    loyaltyPointRate,
-  );
+  const loyaltyPointsEarned = calculateLoyaltyPointsEarned(data.invoiceTotal, loyaltyPointRate);
 
   // Get customer account snapshot
   const accountSnapshot = await getCustomerAccountSnapshot(customerId);
@@ -160,9 +151,10 @@ export async function createOrUpdateInvoice(
   }
 
   // Get next loyalty point threshold (if integrated with rewards system)
-  const nextRewardThreshold = loyaltyPointsEarned > 0
-    ? Math.ceil((accountSnapshot.loyaltyPointsBefore + loyaltyPointsEarned) / 100) * 100
-    : null;
+  const nextRewardThreshold =
+    loyaltyPointsEarned > 0
+      ? Math.ceil((accountSnapshot.loyaltyPointsBefore + loyaltyPointsEarned) / 100) * 100
+      : null;
 
   // Determine status
   let status = data.status || "PENDING";
@@ -356,9 +348,7 @@ export async function getInvoiceWithDetails(invoiceId: string) {
     subtotal: Number(invoice.subtotal),
     tax: Number(invoice.tax),
     discount: Number(invoice.discount),
-    customerCreditLimit: invoice.customerCreditLimit
-      ? Number(invoice.customerCreditLimit)
-      : null,
+    customerCreditLimit: invoice.customerCreditLimit ? Number(invoice.customerCreditLimit) : null,
   };
 }
 

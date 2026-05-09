@@ -2,8 +2,7 @@ import { getRedis, isRedisConfigured } from "./redis";
 
 const MAX_ATTEMPTS = Math.max(1, Number(process.env.AUTH_LOGIN_MAX_ATTEMPTS ?? 10));
 const WINDOW_MS = Math.max(60_000, Number(process.env.AUTH_LOGIN_WINDOW_MS ?? 15 * 60 * 1000));
-const BLOCK_DURATION_MS =
-  Math.max(5, Number(process.env.AUTH_BLOCK_DURATION_MINUTES ?? 30)) * 60 * 1000;
+const BLOCK_DURATION_MS = Math.max(5, Number(process.env.AUTH_BLOCK_DURATION_MINUTES ?? 30)) * 60 * 1000;
 
 interface MemoryEntry {
   count: number;
@@ -44,13 +43,19 @@ async function memReportFailure(key: string): Promise<void> {
   memory.set(key, { ...entry, count: nextCount });
 }
 
-async function redisIsBlocked(client: NonNullable<Awaited<ReturnType<typeof getRedis>>>, key: string): Promise<boolean> {
+async function redisIsBlocked(
+  client: NonNullable<Awaited<ReturnType<typeof getRedis>>>,
+  key: string,
+): Promise<boolean> {
   const blockedUntil = await client.get(`${nsKey(key)}:blockedUntil`);
   if (!blockedUntil) return false;
   return Number(blockedUntil) > Date.now();
 }
 
-async function redisReportFailure(client: NonNullable<Awaited<ReturnType<typeof getRedis>>>, key: string): Promise<void> {
+async function redisReportFailure(
+  client: NonNullable<Awaited<ReturnType<typeof getRedis>>>,
+  key: string,
+): Promise<void> {
   const counterKey = `${nsKey(key)}:count`;
   const blockedKey = `${nsKey(key)}:blockedUntil`;
   const count = await client.incr(counterKey);
@@ -64,7 +69,10 @@ async function redisReportFailure(client: NonNullable<Awaited<ReturnType<typeof 
   }
 }
 
-async function redisReportSuccess(client: NonNullable<Awaited<ReturnType<typeof getRedis>>>, key: string): Promise<void> {
+async function redisReportSuccess(
+  client: NonNullable<Awaited<ReturnType<typeof getRedis>>>,
+  key: string,
+): Promise<void> {
   await client.del(`${nsKey(key)}:count`);
   await client.del(`${nsKey(key)}:blockedUntil`);
 }

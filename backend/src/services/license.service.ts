@@ -1,18 +1,22 @@
 import crypto from "crypto";
-import type { LicenseStatus, Prisma } from "@prisma/client";
 
 import { AuditActions, type AuditAction } from "../constants/auditActions";
 import { prisma } from "../lib/prisma";
+
 import { writeAuditLog } from "./audit.service";
+
+import type { LicenseStatus, Prisma } from "@prisma/client";
 
 const DEFAULT_GRACE_DAYS = Math.max(0, Number(process.env.LICENSE_GRACE_DAYS ?? 7));
 
 function formatLicenseKey(raw: string): string {
-  return raw
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .match(/.{1,4}/g)
-    ?.join("-") ?? raw;
+  return (
+    raw
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .match(/.{1,4}/g)
+      ?.join("-") ?? raw
+  );
 }
 
 export function generateLicenseKey(): string {
@@ -27,7 +31,13 @@ export async function createLicenseRecord(options: {
   graceDays?: number;
   deviceId?: string | null;
   deviceFingerprint?: string | null;
-}): Promise<{ id: string; licenseKey: string; expiresAt: Date | null; trialMode: boolean; graceDays: number }> {
+}): Promise<{
+  id: string;
+  licenseKey: string;
+  expiresAt: Date | null;
+  trialMode: boolean;
+  graceDays: number;
+}> {
   const licenseKey = formatLicenseKey(generateLicenseKey());
   const license = await prisma.license.create({
     data: {
@@ -80,14 +90,24 @@ export async function activateLicense(
   const normalizedKey = formatLicenseKey(licenseKey);
   const license = await prisma.license.findUnique({ where: { licenseKey: normalizedKey } });
   if (!license) {
-    await auditLicenseEvent(null, "LICENSE_ACTIVATION_FAILURE", { reason: "not_found", deviceId, deviceFingerprint, ...meta });
+    await auditLicenseEvent(null, "LICENSE_ACTIVATION_FAILURE", {
+      reason: "not_found",
+      deviceId,
+      deviceFingerprint,
+      ...meta,
+    });
     return { ok: false, reason: "invalid_license" };
   }
 
   const now = new Date();
   const blockedDeviceMismatch = license.deviceId && license.deviceId !== deviceId;
   if (blockedDeviceMismatch) {
-    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", { reason: "device_mismatch", deviceId, deviceFingerprint, ...meta });
+    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", {
+      reason: "device_mismatch",
+      deviceId,
+      deviceFingerprint,
+      ...meta,
+    });
     return { ok: false, reason: "device_mismatch" };
   }
 
@@ -98,12 +118,22 @@ export async function activateLicense(
   const isGraceAllowed = graceUntil ? graceUntil.getTime() >= now.getTime() : !isExpired;
 
   if (license.status === "SUSPENDED") {
-    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", { reason: "suspended", deviceId, deviceFingerprint, ...meta });
+    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", {
+      reason: "suspended",
+      deviceId,
+      deviceFingerprint,
+      ...meta,
+    });
     return { ok: false, reason: "license_suspended" };
   }
 
   if (isExpired && !isGraceAllowed) {
-    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", { reason: "expired", deviceId, deviceFingerprint, ...meta });
+    await auditLicenseEvent(license, "LICENSE_ACTIVATION_FAILURE", {
+      reason: "expired",
+      deviceId,
+      deviceFingerprint,
+      ...meta,
+    });
     return { ok: false, reason: "license_expired" };
   }
 
@@ -124,7 +154,9 @@ export async function activateLicense(
     status: updated.status,
     expiresAt: updated.expiresAt,
     trialMode: updated.trialMode,
-    graceRemainingDays: graceUntil ? Math.max(0, Math.ceil((graceUntil.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))) : 0,
+    graceRemainingDays: graceUntil
+      ? Math.max(0, Math.ceil((graceUntil.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)))
+      : 0,
     graceDays,
     graceUntil: graceUntil?.toISOString() ?? null,
   };
@@ -172,7 +204,9 @@ export async function validateLicense(
     status: license.status,
     expiresAt: license.expiresAt,
     trialMode: license.trialMode,
-    graceRemainingDays: graceUntil ? Math.max(0, Math.ceil((graceUntil.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))) : 0,
+    graceRemainingDays: graceUntil
+      ? Math.max(0, Math.ceil((graceUntil.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)))
+      : 0,
     graceDays,
     graceUntil: graceUntil?.toISOString() ?? null,
   };

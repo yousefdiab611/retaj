@@ -1,8 +1,10 @@
-import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import { prisma } from "../lib/prisma";
+
+import PDFDocument from "pdfkit";
+
 import { formatArabicDate, formatCurrency } from "../lib/money";
+import { prisma } from "../lib/prisma";
 
 export interface InvoiceForPDF {
   id: string;
@@ -44,10 +46,7 @@ export interface InvoiceForPDF {
 /**
  * Generate professional PDF invoice with RTL Arabic support
  */
-export async function generateInvoicePDF(
-  invoice: InvoiceForPDF,
-  outputPath: string,
-): Promise<string> {
+export async function generateInvoicePDF(invoice: InvoiceForPDF, outputPath: string): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       // Create PDF document with Arabic support
@@ -74,18 +73,27 @@ export async function generateInvoicePDF(
       }
 
       // Store name and info (RTL text needs special handling)
-      doc.fontSize(24).font("Helvetica-Bold").text(invoice.tenant.name || "الفاتورة", {
-        align: "right",
-      });
+      doc
+        .fontSize(24)
+        .font("Helvetica-Bold")
+        .text(invoice.tenant.name || "الفاتورة", {
+          align: "right",
+        });
 
-      doc.fontSize(10).font("Helvetica").text(invoice.tenant.storeAddress || "", {
-        align: "right",
-      });
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .text(invoice.tenant.storeAddress || "", {
+          align: "right",
+        });
       if (invoice.tenant.storePhone) {
         doc.text(`رقم الهاتف: ${invoice.tenant.storePhone}`, { align: "right" });
       }
 
-      doc.moveTo(40, doc.y + 10).lineTo(550, doc.y + 10).stroke();
+      doc
+        .moveTo(40, doc.y + 10)
+        .lineTo(550, doc.y + 10)
+        .stroke();
       doc.moveDown();
 
       // Invoice title and number
@@ -109,10 +117,12 @@ export async function generateInvoicePDF(
       if (invoice.customerPhone) {
         doc.fontSize(10).text(`رقم الهاتف: ${invoice.customerPhone}`, { align: "right" });
       }
-      doc.fontSize(10).text(
-        `آخر سداد: ${invoice.lastPaymentDate ? formatArabicDate(invoice.lastPaymentDate) : "لا يوجد"}`,
-        { align: "right" },
-      );
+      doc
+        .fontSize(10)
+        .text(
+          `آخر سداد: ${invoice.lastPaymentDate ? formatArabicDate(invoice.lastPaymentDate) : "لا يوجد"}`,
+          { align: "right" },
+        );
       doc.fontSize(10).text(`عدد الفواتير: ${invoice.previousInvoiceCount}`, { align: "right" });
       doc.moveDown();
 

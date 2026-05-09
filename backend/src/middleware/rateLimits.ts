@@ -1,7 +1,7 @@
 import rateLimit, { type Store } from "express-rate-limit";
 
-import { getRedis, isRedisConfigured } from "../lib/redis";
 import { logger } from "../lib/logger";
+import { getRedis, isRedisConfigured } from "../lib/redis";
 
 const jsonErr = (msg: string, code: string) => ({ error: msg, code });
 

@@ -8,18 +8,18 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 
 ## 📝 PHASE COMPLETION SUMMARY
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phase 1 | ✅ Complete | Payment & Balance Fields |
-| Phase 2 | ✅ Complete | Customer Account Info |
-| Phase 3 | ✅ Complete | Loyalty System |
-| Phase 4 | ✅ Complete | Professional Receipt Design |
-| Phase 5 | ✅ Complete | QR Code Generation |
-| Phase 6 | ✅ Complete | Arabic Display Format (RTL) |
-| Phase 7 | ✅ Complete | Multiple Printing Modes |
-| Phase 8 | ✅ Complete | Business Logic Implementation |
-| Phase 9 | ✅ Complete | Admin Configuration Features |
-| Phase 10 | ✅ Complete | Production Deployment |
+| Phase    | Status      | Description                   |
+| -------- | ----------- | ----------------------------- |
+| Phase 1  | ✅ Complete | Payment & Balance Fields      |
+| Phase 2  | ✅ Complete | Customer Account Info         |
+| Phase 3  | ✅ Complete | Loyalty System                |
+| Phase 4  | ✅ Complete | Professional Receipt Design   |
+| Phase 5  | ✅ Complete | QR Code Generation            |
+| Phase 6  | ✅ Complete | Arabic Display Format (RTL)   |
+| Phase 7  | ✅ Complete | Multiple Printing Modes       |
+| Phase 8  | ✅ Complete | Business Logic Implementation |
+| Phase 9  | ✅ Complete | Admin Configuration Features  |
+| Phase 10 | ✅ Complete | Production Deployment         |
 
 ---
 
@@ -28,7 +28,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Database Layer
 
 #### **`prisma/schema.prisma`** - MAJOR UPDATE
+
 **Changes:**
+
 - Enhanced `Tenant` model with invoice configuration fields:
   - `invoiceLogoUrl`, `invoiceThankYou`, `invoiceFooterNote`
   - `loyaltyPointRate`, `showQRCode`, `showCustomerBalance`
@@ -49,7 +51,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Backend Services
 
 #### **`src/services/invoiceEnterprise.service.ts`** - NEW
+
 **Comprehensive invoice service with:**
+
 - `calculateInvoicePayments()` - Payment & balance calculations
 - `calculateLoyaltyPointsEarned()` - Loyalty point math
 - `getCustomerAccountSnapshot()` - Customer data capture
@@ -60,7 +64,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - `generateInvoiceNumber()` - Sequential numbering
 
 #### **`src/services/qrCode.service.ts`** - NEW
+
 **QR code generation with:**
+
 - `generateInvoiceQRCode()` - Main QR generator with data/image formats
 - `generateThermalReceiptQRCode()` - Optimized for thermal printers
 - `parseQRCodeData()` - QR verification
@@ -68,7 +74,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - Support for verification URLs
 
 #### **`src/services/pdfInvoice.service.ts`** - NEW
+
 **Professional PDF generation with:**
+
 - `generateInvoicePDF()` - Full PDF with RTL Arabic support
 - Header with logo, store info
 - Customer information box
@@ -81,7 +89,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - `getInvoicePDFPath()` - Path management
 
 #### **`src/services/thermalReceipt.service.ts`** - NEW
+
 **Thermal receipt templates with:**
+
 - `generateThermalReceipt80mm()` - Full-width thermal receipt
 - `generateThermalReceipt58mm()` - Narrow thermal receipt
 - `generateThermalReceiptHTML()` - Web preview
@@ -93,7 +103,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Backend Routes
 
 #### **`src/routes/invoices.ts`** - NEW
+
 **Complete REST API with 8 endpoints:**
+
 - `POST /api/invoices` - Create invoice with calculations
 - `GET /api/invoices/:invoiceId` - Retrieve invoice
 - `GET /api/invoices` - List with filtering
@@ -104,12 +116,15 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - `GET /api/invoices/:customerId/statement` - Customer statement
 
 **Route Registration:**
+
 - Updated `src/createApp.ts` to register invoice router with rate limiting
 
 ### Frontend Pages
 
 #### **`frontend/src/pages/InvoicePage.tsx`** - NEW
+
 **Professional invoice display page with:**
+
 - Bilingual support (Arabic/English)
 - RTL layout support
 - Invoice details display
@@ -121,7 +136,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - Customer account information
 
 #### **`frontend/src/pages/InvoiceSettingsPage.tsx`** - NEW
+
 **Admin configuration dashboard with:**
+
 - Display settings toggles (QR, balance, loyalty, tax)
 - Branding configuration (logo, colors, messages)
 - Printer width selection (80mm/58mm)
@@ -132,15 +149,20 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Configuration
 
 #### **`backend/package.json`** - UPDATED
+
 **Added dependencies:**
+
 - `qrcode@^1.5.3` - QR code generation
 - `pdfkit@^0.13.0` - PDF document generation
 
 **Added dev dependencies:**
+
 - `@types/pdfkit@^0.12.11` - TypeScript types
 
 #### **`backend/.env.production.example`** - UPDATED
+
 **Enhanced environment template with:**
+
 - Database configuration section
 - Application settings (NODE_ENV, PORT, TRUST_PROXY)
 - JWT authentication secrets
@@ -156,7 +178,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Deployment
 
 #### **`deploy.sh`** - NEW
+
 **Comprehensive production deployment script (600+ lines) with:**
+
 - System package installation
 - Node.js v20 setup
 - PostgreSQL database creation with proper permissions
@@ -177,6 +201,7 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - System performance optimization
 
 **Features:**
+
 - Interactive configuration prompts
 - Color-coded logging
 - Error handling
@@ -184,7 +209,9 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 - Production hardening
 
 #### **`DEPLOYMENT.md`** - NEW
+
 **Complete 400+ line deployment guide including:**
+
 - Pre-deployment checklist
 - System architecture diagram
 - Quick 5-step deployment process
@@ -207,6 +234,7 @@ Successfully transformed RETAJ POS from a basic invoice system into an enterpris
 ### Phase 1: Payment & Balance Fields
 
 **Automatic Calculations:**
+
 ```
 invoiceTotal = sum of all items + tax - discount
 paidAmount = amount paid on this invoice
@@ -216,6 +244,7 @@ totalOutstanding = previousBalance + remainingAmount
 ```
 
 **Rules:**
+
 - If `paidAmount >= invoiceTotal`: `remainingAmount = 0`
 - If cash customer: `previousBalance = 0`, `totalOutstanding = remainingAmount`
 - All values stored as snapshots in invoice record
@@ -223,6 +252,7 @@ totalOutstanding = previousBalance + remainingAmount
 ### Phase 2: Customer Account Snapshot
 
 Captured at invoice creation:
+
 - Customer name & phone
 - Last payment date
 - Previous invoice count
@@ -232,6 +262,7 @@ Captured at invoice creation:
 ### Phase 3: Loyalty Points
 
 **Calculation:**
+
 - Points earned = floor(invoiceTotal / loyaltyPointRate)
 - Default rate: 1 point per 1 SAR
 - Configurable per tenant
@@ -242,6 +273,7 @@ Captured at invoice creation:
 ### Phase 7: Business Logic
 
 **Status Management:**
+
 - PENDING: Initial state
 - PAID: remainingAmount = 0
 - PARTIALLY_PAID: paidAmount > 0 and remainingAmount > 0
@@ -249,6 +281,7 @@ Captured at invoice creation:
 - VOIDED: Cancelled invoice
 
 **Debt Handling:**
+
 - Debt highlighted in red if remainingAmount > 0
 - Display "تم السداد بالكامل" if fully paid
 - Convert overpayment to customer credit
@@ -258,6 +291,7 @@ Captured at invoice creation:
 ## 🎨 UI/UX ENHANCEMENTS
 
 ### Arabic (RTL) Support
+
 - Full RTL layout for Arabic locale
 - Proper text alignment (right-aligned)
 - Arabic date formatting
@@ -265,6 +299,7 @@ Captured at invoice creation:
 - Professional Arabic typography
 
 ### Invoice Display
+
 - Clean, professional layout
 - Status badges with color coding
 - Payment breakdown table
@@ -273,6 +308,7 @@ Captured at invoice creation:
 - Print-friendly CSS
 
 ### Admin Dashboard
+
 - Toggle-based feature control
 - Color picker for branding
 - Logo URL upload
@@ -284,6 +320,7 @@ Captured at invoice creation:
 ## 🔒 SECURITY FEATURES
 
 ### Database Security
+
 - Proper user permissions in PostgreSQL
 - Foreign key constraints
 - Unique constraints on critical fields
@@ -291,6 +328,7 @@ Captured at invoice creation:
 - Shadow database for migrations
 
 ### API Security
+
 - JWT authentication required for invoice routes
 - Role-based access control (requireRole middleware)
 - Rate limiting on sensitive operations
@@ -298,6 +336,7 @@ Captured at invoice creation:
 - Input validation with Zod schemas
 
 ### Production Security
+
 - SSL/TLS encryption via Let's Encrypt
 - Firewall with UFW configuration
 - Security headers via Helmet
@@ -310,17 +349,20 @@ Captured at invoice creation:
 ## 📊 PERFORMANCE OPTIMIZATIONS
 
 ### Database
+
 - Composite indexes on (tenantId, customerId)
 - Indexes on frequently filtered fields (status, dueDate, createdAt)
 - Connection pooling via Prisma
 - Optimized queries with proper relations
 
 ### Caching
+
 - Redis support for session/cache (optional)
 - Nginx caching for static files
 - Browser cache headers (7-30 days)
 
 ### API
+
 - Rate limiting to prevent abuse
 - Pagination support for large lists
 - Efficient JSON responses
@@ -365,10 +407,12 @@ curl -X POST http://localhost:3000/api/invoices/invoice123/qrcode \
 ## 📦 DEPENDENCIES ADDED
 
 ### Production
+
 - **qrcode**: QR code generation
 - **pdfkit**: PDF document creation
 
 ### Development
+
 - **@types/pdfkit**: TypeScript type definitions
 
 ---
@@ -409,17 +453,20 @@ pm2 start ecosystem.config.js
 ### From Old System to New
 
 1. **Backup existing database**
+
    ```bash
    pg_dump retaj_db > backup.sql
    ```
 
 2. **Update Prisma schema** (done ✅)
+
    ```bash
    npm run db:generate
    npm run db:migrate
    ```
 
 3. **Deploy new backend**
+
    ```bash
    npm install
    npm run build
@@ -427,6 +474,7 @@ pm2 start ecosystem.config.js
    ```
 
 4. **Update frontend** (if using new invoice pages)
+
    ```bash
    npm install
    npm run build
@@ -469,17 +517,17 @@ pm2 start ecosystem.config.js
 
 ## 🎯 FINAL STATISTICS
 
-| Metric | Value |
-|--------|-------|
-| New Database Models | 3 (LoyaltyPoint, InvoiceSettings, + enhanced Invoice) |
-| New Backend Services | 4 (invoiceEnterprise, qrCode, pdfInvoice, thermalReceipt) |
-| New API Routes | 1 (invoices with 8 endpoints) |
-| New Frontend Pages | 2 (InvoicePage, InvoiceSettingsPage) |
-| New Dependencies | 2 (qrcode, pdfkit) |
-| Lines of Code Added | 3000+ |
-| Deployment Automation | 600+ lines in deploy.sh |
-| Documentation | 400+ lines in DEPLOYMENT.md |
-| Security Enhancements | 15+ (SSL, firewall, rate limiting, audit logging, etc.) |
+| Metric                | Value                                                     |
+| --------------------- | --------------------------------------------------------- |
+| New Database Models   | 3 (LoyaltyPoint, InvoiceSettings, + enhanced Invoice)     |
+| New Backend Services  | 4 (invoiceEnterprise, qrCode, pdfInvoice, thermalReceipt) |
+| New API Routes        | 1 (invoices with 8 endpoints)                             |
+| New Frontend Pages    | 2 (InvoicePage, InvoiceSettingsPage)                      |
+| New Dependencies      | 2 (qrcode, pdfkit)                                        |
+| Lines of Code Added   | 3000+                                                     |
+| Deployment Automation | 600+ lines in deploy.sh                                   |
+| Documentation         | 400+ lines in DEPLOYMENT.md                               |
+| Security Enhancements | 15+ (SSL, firewall, rate limiting, audit logging, etc.)   |
 
 ---
 
@@ -498,19 +546,21 @@ After deployment, verify:
 ✅ SSL certificate is valid  
 ✅ PM2 shows healthy status  
 ✅ Database backups running daily  
-✅ Monitoring alerts configured  
+✅ Monitoring alerts configured
 
 ---
 
 ## 🤝 TEAM ONBOARDING
 
 ### For Developers
+
 - Review `DEPLOYMENT.md` for architecture
 - Check new service files for business logic
 - Run `npm install` and `npm run dev`
 - Test invoice endpoints
 
 ### For DevOps/Operations
+
 - Run `deploy.sh` on VPS
 - Configure environment variables
 - Monitor with PM2 dashboard
@@ -518,6 +568,7 @@ After deployment, verify:
 - Configure monitoring alerts
 
 ### For Product/Business
+
 - Review invoice features on InvoicePage
 - Configure settings on InvoiceSettingsPage
 - Test print functionality
@@ -528,6 +579,7 @@ After deployment, verify:
 ## 📞 SUPPORT
 
 For issues:
+
 1. Check `DEPLOYMENT.md` Troubleshooting section
 2. Review `pm2 logs retaj-api --lines 100`
 3. Check `/var/log/nginx/retaj_error.log`

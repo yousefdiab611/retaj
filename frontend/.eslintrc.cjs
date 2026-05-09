@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = {
   extends: [
     "../.eslintrc.cjs",
@@ -13,6 +15,13 @@ module.exports = {
   plugins: ["react-refresh"],
   settings: {
     react: { version: "detect" },
+    "import/resolver": {
+      typescript: {
+        alwaysTryTypes: true,
+        project: path.resolve(__dirname, "tsconfig.json"),
+      },
+      node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+    },
   },
   rules: {
     "react/react-in-jsx-scope": "off",

@@ -82,6 +82,7 @@ APP_NAME="retaj-pos"
 ```
 
 The script will:
+
 - ✅ Update system packages
 - ✅ Install Node.js, PostgreSQL, Redis, Nginx
 - ✅ Create application user
@@ -444,7 +445,7 @@ pm2 restart ecosystem.config.js --update-env
 psql retaj_db
 
 # View slow queries
-SELECT query, calls, mean_time FROM pg_stat_statements 
+SELECT query, calls, mean_time FROM pg_stat_statements
 ORDER BY mean_time DESC LIMIT 10;
 
 # Create indexes
@@ -614,6 +615,6 @@ Your RETAJ POS system is now production-ready with:
 ✅ Real-time monitoring and logging  
 ✅ SSL/TLS encryption  
 ✅ Firewall protection  
-✅ Zero-downtime deployments  
+✅ Zero-downtime deployments
 
 **Start serving your customers with confidence!** 🚀

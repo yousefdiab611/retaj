@@ -1,17 +1,12 @@
 import { useState } from "react";
+
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type Locale = "en" | "ar";
 
@@ -131,9 +126,7 @@ export function InvoiceSettingsPage() {
         {message && (
           <div
             className={`mb-4 p-4 rounded-lg ${
-              message.type === "success"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
+              message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
             }`}
           >
             {message.text}
@@ -150,36 +143,28 @@ export function InvoiceSettingsPage() {
               <Label>{t.showQRCode}</Label>
               <Switch
                 checked={settings.showQRCode}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, showQRCode: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, showQRCode: checked })}
               />
             </div>
             <div className="flex items-center justify-between">
               <Label>{t.showBalance}</Label>
               <Switch
                 checked={settings.showBalance}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, showBalance: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, showBalance: checked })}
               />
             </div>
             <div className="flex items-center justify-between">
               <Label>{t.showLoyalty}</Label>
               <Switch
                 checked={settings.showLoyalty}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, showLoyalty: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, showLoyalty: checked })}
               />
             </div>
             <div className="flex items-center justify-between">
               <Label>{t.showTaxBreakdown}</Label>
               <Switch
                 checked={settings.showTaxBreakdown}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, showTaxBreakdown: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, showTaxBreakdown: checked })}
               />
             </div>
           </CardContent>
@@ -226,9 +211,7 @@ export function InvoiceSettingsPage() {
                   id="primary"
                   type="color"
                   value={settings.primaryColor}
-                  onChange={(e) =>
-                    setSettings({ ...settings, primaryColor: e.target.value })
-                  }
+                  onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
                 />
               </div>
               <div>
@@ -237,16 +220,17 @@ export function InvoiceSettingsPage() {
                   id="secondary"
                   type="color"
                   value={settings.secondaryColor}
-                  onChange={(e) =>
-                    setSettings({ ...settings, secondaryColor: e.target.value })
-                  }
+                  onChange={(e) => setSettings({ ...settings, secondaryColor: e.target.value })}
                 />
               </div>
             </div>
 
             <div>
               <Label htmlFor="printer">{t.printerWidth}</Label>
-              <Select value={settings.printerWidth} onValueChange={(v) => setSettings({ ...settings, printerWidth: v })}>
+              <Select
+                value={settings.printerWidth}
+                onValueChange={(v) => setSettings({ ...settings, printerWidth: v })}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -274,9 +258,7 @@ export function InvoiceSettingsPage() {
                   min="0.1"
                   step="0.1"
                   value={settings.loyaltyRate}
-                  onChange={(e) =>
-                    setSettings({ ...settings, loyaltyRate: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => setSettings({ ...settings, loyaltyRate: parseFloat(e.target.value) })}
                   className="w-20"
                 />
                 <span className="text-sm text-gray-600">{t.loyaltyRateHint}</span>
@@ -287,9 +269,7 @@ export function InvoiceSettingsPage() {
               <Label>{t.enableLoyalty}</Label>
               <Switch
                 checked={settings.enableLoyalty}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, enableLoyalty: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, enableLoyalty: checked })}
               />
             </div>
 
@@ -297,9 +277,7 @@ export function InvoiceSettingsPage() {
               <Label>{t.enableQR}</Label>
               <Switch
                 checked={settings.enableQR}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, enableQR: checked })
-                }
+                onCheckedChange={(checked) => setSettings({ ...settings, enableQR: checked })}
               />
             </div>
           </CardContent>

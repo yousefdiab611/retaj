@@ -5,45 +5,50 @@ Welcome! This directory contains the complete automated build system for Retaj S
 ## 📚 Documentation Files (START HERE)
 
 ### 1. **QUICK_START.md** ⭐ START HERE
-   - 📖 5-minute setup guide
-   - 🚀 Essential commands
-   - 🔑 Quick credentials reference
-   - Size: 2.9 KB
-   
-   **Read This First for Fast Setup**
+
+- 📖 5-minute setup guide
+- 🚀 Essential commands
+- 🔑 Quick credentials reference
+- Size: 2.9 KB
+
+**Read This First for Fast Setup**
 
 ### 2. **SYSTEM_COMPLETE.md**
-   - ✅ Complete system overview
-   - 📦 What was created
-   - 🎯 Quick start instructions
-   - 📈 Performance information
-   - Size: 10.7 KB
-   
-   **Read for Full Context**
+
+- ✅ Complete system overview
+- 📦 What was created
+- 🎯 Quick start instructions
+- 📈 Performance information
+- Size: 10.7 KB
+
+**Read for Full Context**
 
 ### 3. **RUN_SYSTEM_README.md**
-   - 🔧 Prerequisites and installation
-   - 📋 Features and capabilities
-   - 🎯 What each script does
-   - ❌ Error handling details
-   - Size: 8.0 KB
-   
-   **Read for Complete Build System Documentation**
+
+- 🔧 Prerequisites and installation
+- 📋 Features and capabilities
+- 🎯 What each script does
+- ❌ Error handling details
+- Size: 8.0 KB
+
+**Read for Complete Build System Documentation**
 
 ### 4. **CREDENTIALS_AND_SETUP.md**
-   - 🗄️ Database setup instructions
-   - 👤 Test user credentials
-   - 🔐 Login instructions
-   - 📊 Database management
-   - Size: 6.4 KB
-   
-   **Read for Database and Credentials Setup**
+
+- 🗄️ Database setup instructions
+- 👤 Test user credentials
+- 🔐 Login instructions
+- 📊 Database management
+- Size: 6.4 KB
+
+**Read for Database and Credentials Setup**
 
 ---
 
 ## 🚀 Automation Scripts (Ready to Use)
 
 ### Windows - PowerShell (Recommended)
+
 ```
 File: run-all.ps1 (8.8 KB)
 Usage: .\run-all.ps1
@@ -51,6 +56,7 @@ Features: Colors, progress, error tracking
 ```
 
 ### Windows - Batch/CMD (Fallback)
+
 ```
 File: run-all.bat (4.9 KB)
 Usage: run-all.bat
@@ -58,6 +64,7 @@ Features: No PowerShell required
 ```
 
 ### macOS/Linux - Bash
+
 ```
 File: run-all.sh (9.0 KB)
 Usage: chmod +x run-all.sh && ./run-all.sh
@@ -137,12 +144,14 @@ d:\retaj/
 ## 🎯 Getting Started
 
 ### Option 1: Super Fast (If Already Set Up)
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1
 ```
 
 ### Option 2: First Time Setup
+
 1. Read **QUICK_START.md**
 2. Create PostgreSQL database
 3. Run build script
@@ -150,6 +159,7 @@ cd d:\retaj
 5. Start dev servers
 
 ### Option 3: Detailed Setup
+
 1. Read **CREDENTIALS_AND_SETUP.md** for database setup
 2. Read **RUN_SYSTEM_README.md** for full details
 3. Follow step-by-step instructions
@@ -160,43 +170,49 @@ cd d:\retaj
 
 After running `npm run db:seed`:
 
-| Username | Password | Role |
-|----------|----------|------|
-| `ahmed` | `ahmed123` | Full Access |
-| `ahmed` | `ahmed123` | POS Only |
+| Username | Password   | Role        |
+| -------- | ---------- | ----------- |
+| `ahmed`  | `ahmed123` | Full Access |
+| `ahmed`  | `ahmed123` | POS Only    |
 
 ---
 
 ## ✨ Features
 
 ✅ **One Command Build**
+
 - Build backend, frontend, mobile with one command
 - Includes desktop EXE packaging
 - No manual coordination needed
 
 ✅ **Desktop App Ready**
+
 - Standalone Windows EXE installer
 - No Node.js required on client machines
 - Auto-starts backend and frontend
 - Professional installer with shortcuts
-- *Note: Requires admin privileges for code signing in production*
+- _Note: Requires admin privileges for code signing in production_
 
 ✅ **Error Resilience**
+
 - Individual failures don't stop entire process
 - Clear error reporting per module
 
 ✅ **Color Output**
+
 - Green = Success
 - Red = Error
 - Cyan = Information
 - Yellow = Warning
 
 ✅ **Cross-Platform**
+
 - Windows (PowerShell/Batch)
 - macOS/Linux (Bash)
 - No special dependencies
 
 ✅ **Production Ready**
+
 - Proper configuration
 - Security best practices
 - Comprehensive documentation
@@ -206,10 +222,11 @@ After running `npm run db:seed`:
 ## 🔧 How Desktop Packaging Works
 
 1. **Run Build Script**
+
    ```bash
    # Windows
    .\run-all.ps1
-   
+
    # Or batch
    run-all.bat
    ```
@@ -231,15 +248,15 @@ After running `npm run db:seed`:
 
 ## 📊 Files Summary
 
-| File | Type | Size | Purpose |
-|------|------|------|---------|
-| run-all.ps1 | Script | 8.8 KB | Main build (PowerShell) |
-| run-all.bat | Script | 4.9 KB | Backup build (Batch) |
-| run-all.sh | Script | 9.0 KB | Linux/Mac build (Bash) |
-| QUICK_START.md | Doc | 2.9 KB | Fast setup guide |
-| SYSTEM_COMPLETE.md | Doc | 10.7 KB | Full overview |
-| RUN_SYSTEM_README.md | Doc | 8.0 KB | Build docs |
-| CREDENTIALS_AND_SETUP.md | Doc | 6.4 KB | Database setup |
+| File                     | Type   | Size    | Purpose                 |
+| ------------------------ | ------ | ------- | ----------------------- |
+| run-all.ps1              | Script | 8.8 KB  | Main build (PowerShell) |
+| run-all.bat              | Script | 4.9 KB  | Backup build (Batch)    |
+| run-all.sh               | Script | 9.0 KB  | Linux/Mac build (Bash)  |
+| QUICK_START.md           | Doc    | 2.9 KB  | Fast setup guide        |
+| SYSTEM_COMPLETE.md       | Doc    | 10.7 KB | Full overview           |
+| RUN_SYSTEM_README.md     | Doc    | 8.0 KB  | Build docs              |
+| CREDENTIALS_AND_SETUP.md | Doc    | 6.4 KB  | Database setup          |
 
 **Total:** ~50 KB of scripts and documentation
 
@@ -248,18 +265,21 @@ After running `npm run db:seed`:
 ## 🎯 Next Steps
 
 ### For First-Time Users
+
 1. Open **QUICK_START.md**
 2. Follow the 5-minute setup
 3. Run the build script
 4. Start developing!
 
 ### For Experienced Users
+
 ```powershell
 cd d:\retaj
 .\run-all.ps1
 ```
 
 ### For Troubleshooting
+
 1. Check **CREDENTIALS_AND_SETUP.md**
 2. Check **RUN_SYSTEM_README.md**
 3. Look at "Troubleshooting" section
@@ -282,12 +302,14 @@ cd d:\retaj
 ## 🎯 FINAL DELIVERABLES
 
 ### 1. **Windows Desktop EXE**
+
 - **Location:** `d:\retaj\frontend\dist-electron\`
 - **Launcher:** `d:\retaj\launch-desktop.bat`
 - **Status:** ✅ Ready (requires admin privileges for full packaging)
 - **Features:** Standalone, auto-starts backend/frontend, no Node.js required
 
 ### 2. **Mobile App Build Instructions**
+
 - **Framework:** Flutter (iOS + Android)
 - **Location:** `d:\retaj\mobile_cashier\`
 - **Requirements:** Install Flutter SDK
@@ -300,18 +322,21 @@ cd d:\retaj
   ```
 
 ### 3. **Production Database Setup**
+
 - **Configuration:** `backend\.env.production`
 - **Database:** PostgreSQL hosted instance
 - **Migration:** Prisma handles schema updates
 - **Backup:** Configure daily snapshots on your PostgreSQL provider
 
 ### 4. **Login Credentials**
+
 - **Username:** `ahmed`
 - **Password:** `ahmed123`
 - **Role:** Full Admin Access
 - **Platforms:** Web, Desktop, Mobile (when built)
 
 ### 5. **Services Status Checklist**
+
 - ✅ Backend API (Express + Prisma)
 - ✅ Frontend Web App (React + Vite)
 - ✅ Desktop App (Electron)
@@ -352,7 +377,7 @@ cd d:\retaj
 **Version:** 1.0.0  
 **Status:** ✅ PRODUCTION READY  
 **Last Updated:** April 24, 2026 07:00 UTC  
-**Tested:** ✅ All systems operational  
+**Tested:** ✅ All systems operational
 
 **Phase 1:** ✅ Quality Assurance Complete  
 **Phase 2:** ✅ Desktop EXE Infrastructure Ready  

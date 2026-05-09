@@ -1,10 +1,11 @@
 import { CreditCard, Key, Layers, ShieldAlert, Package, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import type { AdminDashboardStats } from "@/types/billing";
+
 import { MainNav } from "@/components/MainNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAdminDashboardStats } from "@/lib/api";
-import type { AdminDashboardStats } from "@/types/billing";
 
 export function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
@@ -34,7 +35,8 @@ export function AdminDashboardPage() {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">Admin dashboard</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Track customers, revenue, subscriptions and license health from one centralized SaaS control plane.
+              Track customers, revenue, subscriptions and license health from one centralized SaaS control
+              plane.
             </p>
           </div>
         </div>
@@ -53,7 +55,9 @@ export function AdminDashboardPage() {
                 <Layers className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.totalCustomers}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.totalCustomers}
+            </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
@@ -62,7 +66,9 @@ export function AdminDashboardPage() {
                 <CreditCard className="h-4 w-4 text-secondary" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.ordersToday}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.ordersToday}
+            </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
@@ -71,7 +77,9 @@ export function AdminDashboardPage() {
                 <ShieldAlert className="h-4 w-4 text-amber-500" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.pendingOfflineSyncs}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.pendingOfflineSyncs}
+            </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
@@ -80,7 +88,9 @@ export function AdminDashboardPage() {
                 <Key className="h-4 w-4 text-emerald-500" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.lowStockCount}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.lowStockCount}
+            </CardContent>
           </Card>
         </div>
 
@@ -92,7 +102,9 @@ export function AdminDashboardPage() {
                 <Users className="h-4 w-4 text-indigo-500" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.newCustomers}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.newCustomers}
+            </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
@@ -114,7 +126,11 @@ export function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
-              {loading ? "..." : stats?.lastBackupAt ? new Date(stats.lastBackupAt).toLocaleString() : "No backups yet"}
+              {loading
+                ? "..."
+                : stats?.lastBackupAt
+                  ? new Date(stats.lastBackupAt).toLocaleString()
+                  : "No backups yet"}
             </CardContent>
           </Card>
           <Card>
@@ -124,7 +140,9 @@ export function AdminDashboardPage() {
                 <Package className="h-4 w-4 text-muted-foreground" />
               </div>
             </CardHeader>
-            <CardContent className="text-3xl font-semibold">{loading ? "..." : stats?.appVersion}</CardContent>
+            <CardContent className="text-3xl font-semibold">
+              {loading ? "..." : stats?.appVersion}
+            </CardContent>
           </Card>
         </div>
 
@@ -134,7 +152,11 @@ export function AdminDashboardPage() {
               <CardTitle>Revenue this month</CardTitle>
             </CardHeader>
             <CardContent className="text-4xl font-semibold">
-              {loading ? "…" : new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(stats?.monthlyRevenue ?? 0)}
+              {loading
+                ? "…"
+                : new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(
+                    stats?.monthlyRevenue ?? 0,
+                  )}
             </CardContent>
           </Card>
           <Card>
@@ -142,7 +164,11 @@ export function AdminDashboardPage() {
               <CardTitle>Revenue today</CardTitle>
             </CardHeader>
             <CardContent className="text-4xl font-semibold">
-              {loading ? "…" : new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(stats?.revenueToday ?? 0)}
+              {loading
+                ? "…"
+                : new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(
+                    stats?.revenueToday ?? 0,
+                  )}
             </CardContent>
           </Card>
           <Card>
@@ -150,10 +176,20 @@ export function AdminDashboardPage() {
               <CardTitle>Sync engine status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>{loading ? "…" : stats?.databaseStatus.provider ?? "--"}</p>
-              <p className="font-medium">{loading ? "…" : stats?.databaseStatus.syncEngineStatus ?? "UNKNOWN"}</p>
-              <p className="text-xs text-muted-foreground">{loading ? "" : stats?.databaseStatus.online ? "Database connected" : "Database offline / fallback"}</p>
-              {loading ? null : stats?.databaseStatus.lastError ? <p className="text-xs text-destructive">{stats.databaseStatus.lastError}</p> : null}
+              <p>{loading ? "…" : (stats?.databaseStatus.provider ?? "--")}</p>
+              <p className="font-medium">
+                {loading ? "…" : (stats?.databaseStatus.syncEngineStatus ?? "UNKNOWN")}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {loading
+                  ? ""
+                  : stats?.databaseStatus.online
+                    ? "Database connected"
+                    : "Database offline / fallback"}
+              </p>
+              {loading ? null : stats?.databaseStatus.lastError ? (
+                <p className="text-xs text-destructive">{stats.databaseStatus.lastError}</p>
+              ) : null}
             </CardContent>
           </Card>
         </div>
@@ -174,14 +210,23 @@ export function AdminDashboardPage() {
                   <div className="px-2 py-4 text-sm text-muted-foreground">Loading products…</div>
                 ) : stats?.topProducts.length ? (
                   stats.topProducts.map((product) => (
-                    <div key={product.productId} className="grid grid-cols-[2fr_1fr_1fr] gap-4 border-b border-slate-200/60 px-2 py-3 text-sm">
+                    <div
+                      key={product.productId}
+                      className="grid grid-cols-[2fr_1fr_1fr] gap-4 border-b border-slate-200/60 px-2 py-3 text-sm"
+                    >
                       <span>{product.name}</span>
                       <span className="text-right">{product.quantitySold}</span>
-                      <span className="text-right">{new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(product.revenue)}</span>
+                      <span className="text-right">
+                        {new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(
+                          product.revenue,
+                        )}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <div className="px-2 py-4 text-sm text-muted-foreground">No top product data available yet.</div>
+                  <div className="px-2 py-4 text-sm text-muted-foreground">
+                    No top product data available yet.
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -194,7 +239,14 @@ export function AdminDashboardPage() {
               <CardTitle>Offline sync health</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>Last offline sync attempt: {loading ? "…" : stats?.lastOfflineSyncAt ? new Date(stats.lastOfflineSyncAt).toLocaleString() : "No sync data"}</p>
+              <p>
+                Last offline sync attempt:{" "}
+                {loading
+                  ? "…"
+                  : stats?.lastOfflineSyncAt
+                    ? new Date(stats.lastOfflineSyncAt).toLocaleString()
+                    : "No sync data"}
+              </p>
               <p>Pending offline transaction queue: {loading ? "…" : stats?.pendingOfflineSyncs}</p>
               <p>Orders today from the POS: {loading ? "…" : stats?.ordersToday}</p>
             </CardContent>
@@ -204,7 +256,13 @@ export function AdminDashboardPage() {
               <CardTitle>Operational readiness</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>{loading ? "…" : stats?.databaseStatus.online ? "Backend database ready" : "Backend fallback mode active"}</p>
+              <p>
+                {loading
+                  ? "…"
+                  : stats?.databaseStatus.online
+                    ? "Backend database ready"
+                    : "Backend fallback mode active"}
+              </p>
               <p>Provider: {loading ? "…" : stats?.databaseStatus.provider}</p>
               <p>Sync engine: {loading ? "…" : stats?.databaseStatus.syncEngineStatus}</p>
             </CardContent>

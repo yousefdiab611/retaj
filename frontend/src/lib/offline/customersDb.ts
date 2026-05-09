@@ -60,9 +60,7 @@ export async function saveOfflineCustomer(payload: {
 
 export async function listDirtyOfflineCustomers(): Promise<OfflineCustomerHit[]> {
   const rows = await getAllFromStore<OfflineCustomerRecord>(STORE);
-  return rows
-    .filter((row) => row.dirty)
-    .sort((a, b) => a.updatedAt - b.updatedAt);
+  return rows.filter((row) => row.dirty).sort((a, b) => a.updatedAt - b.updatedAt);
 }
 
 export async function countDirtyOfflineCustomers(): Promise<number> {
@@ -84,7 +82,9 @@ export async function searchOfflineCustomers(query: string): Promise<OfflineCust
     .slice(0, 50);
 }
 
-export async function findOfflineCustomerByPhone(phone?: string | null): Promise<OfflineCustomerHit | undefined> {
+export async function findOfflineCustomerByPhone(
+  phone?: string | null,
+): Promise<OfflineCustomerHit | undefined> {
   if (!phone) return undefined;
   const result = await getFromIndex<OfflineCustomerRecord>(STORE, "phone", phone);
   if (result.length > 0) return result[0];
@@ -92,7 +92,9 @@ export async function findOfflineCustomerByPhone(phone?: string | null): Promise
 }
 
 export async function markOfflineCustomerSynced(localId: string, remoteId?: string): Promise<void> {
-  const row = await withOfflineStore<OfflineCustomerRecord | undefined>(STORE, "readonly", (store) => store.get(localId));
+  const row = await withOfflineStore<OfflineCustomerRecord | undefined>(STORE, "readonly", (store) =>
+    store.get(localId),
+  );
   if (!row) return;
   const updated = { ...row, remoteId: remoteId ?? row.remoteId, dirty: false, updatedAt: Date.now() };
   await withOfflineStore(STORE, "readwrite", (store) => store.put(updated));

@@ -26,6 +26,7 @@ GRANT ALL PRIVILEGES ON SCHEMA public TO retaj_user;
 ### Step 2: Verify Connection
 
 Test the connection:
+
 ```bash
 # Windows
 psql -U retaj_user -d retaj_db -h localhost
@@ -55,6 +56,7 @@ chmod +x run-all.sh
 
 **First Time Setup:**
 The script will:
+
 1. ✅ Install dependencies
 2. ✅ Generate Prisma client
 3. ✅ Compile backend TypeScript
@@ -75,11 +77,11 @@ npm run db:seed
 
 ### Default Test Users
 
-| Username | Password | Role | Purpose |
-|----------|----------|------|---------|
-| `ahmed` | `ahmed123` | ADMIN | Full system access, user management |
-| `ahmed` | `ahmed123` | CASHIER | POS operations, sales |
-| `manager` | *(requires manual setup)* | MANAGER | Inventory & reports |
+| Username  | Password                  | Role    | Purpose                             |
+| --------- | ------------------------- | ------- | ----------------------------------- |
+| `ahmed`   | `ahmed123`                | ADMIN   | Full system access, user management |
+| `ahmed`   | `ahmed123`                | CASHIER | POS operations, sales               |
+| `manager` | _(requires manual setup)_ | MANAGER | Inventory & reports                 |
 
 ---
 
@@ -113,6 +115,7 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:3001/api/users
 ## 📱 Running Individual Modules
 
 ### Backend (Development)
+
 ```bash
 cd d:\retaj\backend
 npm run dev
@@ -120,6 +123,7 @@ npm run dev
 ```
 
 ### Frontend (Development)
+
 ```bash
 cd d:\retaj\frontend
 npm run dev
@@ -127,6 +131,7 @@ npm run dev
 ```
 
 ### Mobile (If Flutter installed)
+
 ```bash
 cd d:\retaj\mobile_cashier
 flutter run
@@ -138,6 +143,7 @@ flutter run
 ## 🗄️ Database Management
 
 ### View Database in Prisma Studio
+
 ```bash
 cd d:\retaj\backend
 npm run db:studio
@@ -145,6 +151,7 @@ npm run db:studio
 ```
 
 ### Reset Database (Caution!)
+
 ```bash
 cd d:\retaj\backend
 npx prisma migrate reset
@@ -154,6 +161,7 @@ npm run db:seed
 ```
 
 ### Generate New Migration
+
 ```bash
 cd d:\retaj\backend
 npx prisma migrate dev --name your_migration_name
@@ -164,6 +172,7 @@ npx prisma migrate dev --name your_migration_name
 ## ⚙️ Environment Variables
 
 ### Backend Configuration (`backend/.env`)
+
 ```dotenv
 DATABASE_URL="postgresql://retaj_user:RetajPass123!@localhost:5432/retaj_db"
 PORT=3001
@@ -173,6 +182,7 @@ LOG_LEVEL=debug
 ```
 
 ### Frontend Configuration (`frontend/.env`)
+
 ```dotenv
 # Leave empty to use proxy or specify backend URL
 # VITE_API_URL=http://localhost:3001
@@ -185,6 +195,7 @@ LOG_LEVEL=debug
 ### Authentication Flow
 
 1. **Login** → Get JWT token
+
    ```
    POST /api/auth/login
    Body: { username, password }
@@ -192,6 +203,7 @@ LOG_LEVEL=debug
    ```
 
 2. **Use Token** → Include in headers
+
    ```
    Authorization: Bearer <access_token>
    ```
@@ -206,37 +218,49 @@ LOG_LEVEL=debug
 ## 🐛 Troubleshooting
 
 ### "Cannot connect to database"
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:5432
 ```
-**Solution:** 
+
+**Solution:**
+
 - Ensure PostgreSQL is running
 - Verify credentials in `backend/.env`
 - Check database exists: `psql -l`
 
 ### "Invalid login credentials"
+
 ```
 Error: Login failed
 ```
+
 **Solution:**
+
 - Verify user exists: check Prisma Studio
 - Run seed: `npm run db:seed`
 - Reset database if needed: `npx prisma migrate reset`
 
 ### "Frontend can't reach backend"
+
 ```
 Error: Failed to fetch /api/*
 ```
+
 **Solution:**
+
 - Ensure backend is running: `npm run dev` in backend folder
 - Check `ALLOWED_ORIGINS` in `backend/.env`
 - Add frontend URL to allowed origins
 
 ### "Module not found"
+
 ```
 Error: Cannot find module 'xxx'
 ```
+
 **Solution:**
+
 - Run `npm install` in affected folder
 - Delete `node_modules` and `package-lock.json`
 - Reinstall: `npm install`
@@ -253,7 +277,9 @@ Test data includes:
 - **3 Users** (Admin, Cashier, Manager roles)
 
 ### Example Branch ID
+
 All users created have `branchId` set to the Main Store ID. Get it from:
+
 ```
 Prisma Studio: http://localhost:5555 → Branch table
 API: GET /api/branches (requires auth)
@@ -288,6 +314,7 @@ cd backend && npx prisma migrate reset && npm run db:seed
 ## 📞 Support
 
 For issues:
+
 1. Check console output for specific error messages
 2. Review logs: `backend/logs/` (if exists)
 3. Check Prisma Studio: `npm run db:studio`

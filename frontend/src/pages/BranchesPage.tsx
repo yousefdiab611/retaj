@@ -4,13 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createBranchApi, fetchBranches, fetchBranchStats, updateBranchApi, type BranchDto } from "@/lib/api";
@@ -105,7 +99,14 @@ export function BranchesPage() {
             <p className="text-sm text-muted-foreground">Stores and POS inventory scope per location.</p>
           </div>
           <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void load()} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => void load()}
+              disabled={loading}
+            >
               <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
               Refresh
             </Button>
@@ -117,7 +118,9 @@ export function BranchesPage() {
         </div>
 
         {error ? (
-          <p className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+          <p className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </p>
         ) : null}
 
         {loading && rows.length === 0 ? (
@@ -146,7 +149,13 @@ export function BranchesPage() {
                     <Button type="button" variant="secondary" size="sm" onClick={() => setStatsBranch(b)}>
                       Stats
                     </Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => openEdit(b)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => openEdit(b)}
+                    >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </Button>

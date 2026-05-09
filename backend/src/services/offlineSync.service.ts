@@ -1,9 +1,10 @@
 import { AuditActions } from "../constants/auditActions";
+
 import { writeAuditLog } from "./audit.service";
 import { createSaleTransaction } from "./transactionSale.service";
-import type { z } from "zod";
 
-import { offlineSyncItemSchema } from "../validation/schemas";
+import type { offlineSyncItemSchema } from "../validation/schemas";
+import type { z } from "zod";
 
 type OfflineItem = z.infer<typeof offlineSyncItemSchema>;
 

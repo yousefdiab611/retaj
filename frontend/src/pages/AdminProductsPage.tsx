@@ -4,22 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  createAdminProduct,
-  fetchAdminProducts,
-  updateAdminProduct,
-  type AdminProduct,
-} from "@/lib/api";
+import { createAdminProduct, fetchAdminProducts, updateAdminProduct, type AdminProduct } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const emptyForm = {
@@ -90,7 +79,14 @@ export function AdminProductsPage() {
     try {
       const price = Number.parseFloat(form.price);
       const stockQty = Number.parseInt(form.stockQty, 10);
-      if (!form.sku.trim() || !form.name.trim() || Number.isNaN(price) || price < 0 || Number.isNaN(stockQty) || stockQty < 0) {
+      if (
+        !form.sku.trim() ||
+        !form.name.trim() ||
+        Number.isNaN(price) ||
+        price < 0 ||
+        Number.isNaN(stockQty) ||
+        stockQty < 0
+      ) {
         setError("Check SKU, name, price, and stock.");
         setSaving(false);
         return;
@@ -160,7 +156,13 @@ export function AdminProductsPage() {
             <p className="text-sm text-muted-foreground">Manage SKUs, barcodes, and stock.</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:ms-auto">
-            <Button type="button" variant="secondary" className="gap-2" onClick={() => void load()} disabled={loading}>
+            <Button
+              type="button"
+              variant="secondary"
+              className="gap-2"
+              onClick={() => void load()}
+              disabled={loading}
+            >
               <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
               Refresh
             </Button>
@@ -205,14 +207,22 @@ export function AdminProductsPage() {
                     {products.map((p) => (
                       <tr key={p.id} className="border-b border-border/60">
                         <td className="px-4 py-2 font-mono text-xs">{p.sku}</td>
-                        <td className="px-4 py-2 font-mono text-xs text-muted-foreground">{p.barcode ?? "—"}</td>
+                        <td className="px-4 py-2 font-mono text-xs text-muted-foreground">
+                          {p.barcode ?? "—"}
+                        </td>
                         <td className="px-4 py-2 font-medium">{p.name}</td>
                         <td className="px-4 py-2 text-muted-foreground">{p.category ?? "—"}</td>
                         <td className="px-4 py-2 text-end tabular-nums">{money(p.price)}</td>
                         <td className="px-4 py-2 text-end tabular-nums">{p.stockQty}</td>
                         <td className="px-4 py-2">{p.isActive ? "Yes" : "No"}</td>
                         <td className="px-4 py-2">
-                          <Button type="button" variant="ghost" size="sm" className="gap-1" onClick={() => openEdit(p)}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1"
+                            onClick={() => openEdit(p)}
+                          >
                             <Pencil className="h-4 w-4" />
                             Edit
                           </Button>

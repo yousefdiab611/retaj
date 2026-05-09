@@ -7,11 +7,7 @@ import {
   listStockHistory,
 } from "../services/inventory/stockOperations.service";
 import { getClientIp, getUserAgent, firstPathParam } from "../utils/requestMeta";
-import {
-  stockInBodySchema,
-  stockOutBodySchema,
-  stockTransferBodySchema,
-} from "../validation/schemas";
+import { stockInBodySchema, stockOutBodySchema, stockTransferBodySchema } from "../validation/schemas";
 
 export const stockRouter = Router();
 

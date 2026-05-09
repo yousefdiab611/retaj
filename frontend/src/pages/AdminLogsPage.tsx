@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
 import { ClipboardList } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import type { AuditLogRow } from "@/types/billing";
 
 import { MainNav } from "@/components/MainNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAdminLogs } from "@/lib/api";
-import type { AuditLogRow } from "@/types/billing";
 
 export function AdminLogsPage() {
   const [logs, setLogs] = useState<AuditLogRow[]>([]);
@@ -79,7 +80,9 @@ export function AdminLogsPage() {
                 ) : (
                   logs.map((log) => (
                     <tr key={log.id} className="border-b border-border/60">
-                      <td className="py-2 pe-3 tabular-nums text-muted-foreground">{new Date(log.createdAt).toLocaleString()}</td>
+                      <td className="py-2 pe-3 tabular-nums text-muted-foreground">
+                        {new Date(log.createdAt).toLocaleString()}
+                      </td>
                       <td className="py-2 pe-3 uppercase tracking-wide">{log.action}</td>
                       <td className="py-2 pe-3">{log.entityType ?? "—"}</td>
                       <td className="py-2 pe-3">{log.userId ?? "system"}</td>

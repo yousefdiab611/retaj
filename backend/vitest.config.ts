@@ -16,13 +16,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html", "lcov"],
       include: ["src/**/*.ts"],
-      exclude: [
-        "src/**/*.d.ts",
-        "src/**/__mocks__/**",
-        "src/index.ts",
-        "src/createApp.ts",
-        "src/types/**",
-      ],
+      exclude: ["src/**/*.d.ts", "src/**/__mocks__/**", "src/index.ts", "src/createApp.ts", "src/types/**"],
       thresholds: {
         lines: 0,
         functions: 0,

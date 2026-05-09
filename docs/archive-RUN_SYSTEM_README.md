@@ -31,16 +31,19 @@ retaj/
 ## 🔧 Prerequisites
 
 ### Windows
+
 - **Node.js** 18+ (with npm)
 - **PowerShell** 5.1+ or Command Prompt
 - **PostgreSQL** 12+ (for database)
 
 ### macOS/Linux
+
 - **Node.js** 18+ (with npm)
 - **Bash** shell
 - **PostgreSQL** 12+ (for database)
 
 ### Mobile (Optional)
+
 - **Flutter SDK** 3.0+ (only if building mobile)
 
 ---
@@ -59,6 +62,7 @@ GRANT ALL PRIVILEGES ON DATABASE retaj_db TO retaj_user;
 ```
 
 Or using command line:
+
 ```bash
 # Windows (if pg_sql available)
 psql -U postgres -c "CREATE USER retaj_user WITH PASSWORD 'RetajPass123!';"
@@ -108,6 +112,7 @@ chmod +x run-all.sh
 ## 📊 What the Script Does
 
 ### 1. **Backend Setup**
+
 ```
 [INFO] Running: npm install
 [INFO] Running: npx prisma generate
@@ -116,6 +121,7 @@ Output → backend/dist
 ```
 
 ### 2. **Frontend Setup**
+
 ```
 [INFO] Running: npm install
 [INFO] Running: npm run build
@@ -123,6 +129,7 @@ Output → frontend/dist
 ```
 
 ### 3. **Mobile Setup** (Optional)
+
 ```
 [INFO] Running: flutter pub get
 [INFO] Running: flutter build apk --release
@@ -130,6 +137,7 @@ Output → mobile_cashier/build/app/outputs/flutter-apk
 ```
 
 ### 4. **Summary Report**
+
 ```
 ✔ Backend ready → d:\retaj\backend\dist
 ✔ Frontend ready → d:\retaj\frontend\dist
@@ -142,6 +150,7 @@ Output → mobile_cashier/build/app/outputs/flutter-apk
 ## 📝 Environment Files
 
 ### Backend Configuration (`backend/.env`)
+
 ```dotenv
 DATABASE_URL="postgresql://retaj_user:RetajPass123!@localhost:5432/retaj_db"
 PORT=3001
@@ -151,6 +160,7 @@ ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
 ```
 
 ### Frontend Configuration (`frontend/.env`)
+
 ```dotenv
 # Leave empty to use Vite proxy, or specify API URL
 # VITE_API_URL=http://localhost:3001
@@ -163,6 +173,7 @@ ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
 After the build system completes, you can run modules separately:
 
 ### Backend (Development)
+
 ```bash
 cd backend
 npm run dev
@@ -170,6 +181,7 @@ npm run dev
 ```
 
 ### Backend (Production)
+
 ```bash
 cd backend
 npm start
@@ -177,6 +189,7 @@ npm start
 ```
 
 ### Frontend (Development)
+
 ```bash
 cd frontend
 npm run dev
@@ -184,6 +197,7 @@ npm run dev
 ```
 
 ### Frontend (Production)
+
 ```bash
 cd frontend
 npm run build  # Already done by run-all
@@ -191,12 +205,14 @@ npm run build  # Already done by run-all
 ```
 
 ### Mobile (Development)
+
 ```bash
 cd mobile_cashier
 flutter run
 ```
 
 ### Mobile (Production)
+
 ```bash
 cd mobile_cashier
 flutter build apk --release   # Already done by run-all
@@ -240,21 +256,27 @@ Build completed with 2 error(s)
 ### Common Issues
 
 **PostgreSQL Connection Error**
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:5432
 ```
+
 Solution: Ensure PostgreSQL is running and credentials in `.env` are correct.
 
 **Flutter Not Found**
+
 ```
 ⚠ Flutter not found. Skipping mobile build.
 ```
+
 Solution: Install Flutter SDK or use `-SkipMobile` flag in PowerShell.
 
 **npm: command not found**
+
 ```
 Error: npm: command not found
 ```
+
 Solution: Install Node.js 18+ from https://nodejs.org/
 
 ---
@@ -263,11 +285,11 @@ Solution: Install Node.js 18+ from https://nodejs.org/
 
 After successful build:
 
-| Module | Location | Purpose |
-|--------|----------|---------|
-| Backend | `backend/dist` | Production API files |
-| Frontend | `frontend/dist` | Production web files |
-| Mobile | `mobile_cashier/build/app/outputs/flutter-apk` | APK file for Android |
+| Module   | Location                                       | Purpose              |
+| -------- | ---------------------------------------------- | -------------------- |
+| Backend  | `backend/dist`                                 | Production API files |
+| Frontend | `frontend/dist`                                | Production web files |
+| Mobile   | `mobile_cashier/build/app/outputs/flutter-apk` | APK file for Android |
 
 ---
 
@@ -295,23 +317,30 @@ After successful build:
 ## 🐛 Troubleshooting
 
 ### All modules fail
+
 Check that Node.js is installed:
+
 ```bash
 node --version
 npm --version
 ```
 
 ### Database connection fails
+
 Verify PostgreSQL is running and credentials are correct:
+
 ```bash
 psql -U retaj_user -d retaj_db -h localhost
 ```
 
 ### Frontend can't connect to backend
+
 Ensure backend is running and `ALLOWED_ORIGINS` in `backend/.env` includes frontend URL.
 
 ### Mobile build is slow
+
 Flutter builds are resource-intensive. Use `-SkipMobile` flag to skip during development:
+
 ```powershell
 .\run-all.ps1 -SkipMobile
 ```
@@ -329,6 +358,7 @@ Flutter builds are resource-intensive. Use `-SkipMobile` flag to skip during dev
 ## 📞 Support
 
 For issues or questions, check:
+
 1. Database connection (PostgreSQL running?)
 2. Node.js version (18+?)
 3. Environment files (`.env` properly configured?)

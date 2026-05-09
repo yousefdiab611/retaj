@@ -1,13 +1,10 @@
-import type { Prisma } from "@prisma/client";
-
 import { prisma } from "../../lib/prisma";
+
+import type { Prisma } from "@prisma/client";
 
 function movementWhereBranch(branchId: string): Prisma.StockMovementWhereInput {
   return {
-    OR: [
-      { warehouse: { branchId } },
-      { toWarehouse: { branchId } },
-    ],
+    OR: [{ warehouse: { branchId } }, { toWarehouse: { branchId } }],
   };
 }
 
@@ -35,8 +32,7 @@ export async function reportStockByWarehouse(branchId: string) {
     quantity: s.quantity,
     minStock: s.minStock,
     reorderPoint: s.reorderPoint,
-    valuation:
-      s.product.cost != null ? Number(s.product.cost) * s.quantity : null,
+    valuation: s.product.cost != null ? Number(s.product.cost) * s.quantity : null,
   }));
 }
 
@@ -71,9 +67,7 @@ export async function reportStockMovements(params: {
   const where: Prisma.StockMovementWhereInput = {
     AND: [
       movementWhereBranch(branchId),
-      ...(warehouseId
-        ? [{ OR: [{ warehouseId }, { toWarehouseId: warehouseId }] }]
-        : []),
+      ...(warehouseId ? [{ OR: [{ warehouseId }, { toWarehouseId: warehouseId }] }] : []),
       ...(productId ? [{ productId }] : []),
       ...(from || to
         ? [

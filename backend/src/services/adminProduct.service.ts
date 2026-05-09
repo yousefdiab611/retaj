@@ -1,14 +1,15 @@
 import { Prisma } from "@prisma/client";
 
-import type { z } from "zod";
-
 import { AuditActions } from "../constants/auditActions";
 import { toDecimalString } from "../lib/money";
 import { prisma } from "../lib/prisma";
-import { adminProductCreateSchema, adminProductPatchSchema } from "../validation/schemas";
+
 import { writeAuditLog } from "./audit.service";
-import { getOrCreateDefaultWarehouse } from "./inventory/warehouse.service";
 import { syncProductTotalStock } from "./inventory/stockSync.service";
+import { getOrCreateDefaultWarehouse } from "./inventory/warehouse.service";
+
+import type { adminProductCreateSchema, adminProductPatchSchema } from "../validation/schemas";
+import type { z } from "zod";
 
 type CreateIn = z.infer<typeof adminProductCreateSchema>;
 type PatchIn = z.infer<typeof adminProductPatchSchema>;
@@ -76,8 +77,7 @@ export async function createAdminProduct(
       ? null
       : String(body.description).trim() || null;
   const cost = body.cost === undefined ? null : body.cost;
-  const lowStockAt =
-    body.lowStockAt === undefined || body.lowStockAt === null ? null : body.lowStockAt;
+  const lowStockAt = body.lowStockAt === undefined || body.lowStockAt === null ? null : body.lowStockAt;
   const isActive = body.isActive === false ? false : true;
   let barcode: string | null = null;
   if (body.barcode !== undefined && body.barcode !== null && body.barcode !== "") {

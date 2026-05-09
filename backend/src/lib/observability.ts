@@ -1,6 +1,6 @@
-import type { Application, NextFunction, Request, Response } from "express";
-
 import { logger } from "./logger";
+
+import type { Application, NextFunction, Request, Response } from "express";
 
 /**
  * Lazily initialised Sentry instance. We avoid importing @sentry/node at the
@@ -26,12 +26,7 @@ export function initObservability(): void {
       tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0.1),
       profilesSampleRate: Number(process.env.SENTRY_PROFILES_SAMPLE_RATE ?? 0),
       sendDefaultPii: false,
-      ignoreErrors: [
-        "DatabaseUnavailableError",
-        /AbortError/,
-        /TimeoutError/,
-        "RATE_LIMIT",
-      ],
+      ignoreErrors: ["DatabaseUnavailableError", /AbortError/, /TimeoutError/, "RATE_LIMIT"],
     });
     sentryRef = Sentry;
     logger.info({ environment: process.env.SENTRY_ENVIRONMENT }, "sentry_initialised");

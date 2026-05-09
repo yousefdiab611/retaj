@@ -1,10 +1,10 @@
 import "express-async-errors";
 
+import { UserRole } from "@prisma/client";
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response, type Router } from "express";
 import helmet from "helmet";
 import { ZodError } from "zod";
-import { UserRole } from "@prisma/client";
 
 import { getCorsOrigin } from "./config/cors";
 import { billingController } from "./controllers/billingController";
@@ -19,16 +19,16 @@ import { requestContext } from "./middleware/requestContext";
 import { requireAuth } from "./middleware/requireAuth";
 import { requireRole } from "./middleware/requireRole";
 import { sanitizeBody } from "./middleware/sanitizeBody";
-import { adminRouter as adminCommercialRouter } from "./routes/admin-commercial";
 import { adminRouter } from "./routes/admin";
+import { adminRouter as adminCommercialRouter } from "./routes/admin-commercial";
 import { adminProductsRouter } from "./routes/adminProducts";
 import { authRouter } from "./routes/auth";
 import { backupRouter } from "./routes/backup";
-import { billingRouter as billingCommercialRouter } from "./routes/billing-commercial";
 import { billingRouter } from "./routes/billing";
+import { billingRouter as billingCommercialRouter } from "./routes/billing-commercial";
 import { branchesRouter } from "./routes/branches";
-import { customerRouter as customerCommercialRouter } from "./routes/customer-commercial";
 import { customerRouter } from "./routes/customer";
+import { customerRouter as customerCommercialRouter } from "./routes/customer-commercial";
 import { customersRouter } from "./routes/customers";
 import { docsRouter } from "./routes/docs";
 import { healthRouter } from "./routes/health";
@@ -124,10 +124,7 @@ export function createApp() {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: [
-            "'self'",
-            ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : []),
-          ],
+          styleSrc: ["'self'", ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : [])],
           scriptSrc: ["'self'"],
           imgSrc: ["'self'", "data:", "blob:", "https:"],
           connectSrc: ["'self'", "https:", "wss:"],
@@ -189,9 +186,7 @@ export function createApp() {
   app.use((req, res, next) => {
     const timeout = setTimeout(() => {
       if (!res.headersSent) {
-        res
-          .status(408)
-          .json({ error: "Request timeout", code: "TIMEOUT", requestId: req.requestId });
+        res.status(408).json({ error: "Request timeout", code: "TIMEOUT", requestId: req.requestId });
       }
     }, REQUEST_TIMEOUT_MS);
     res.on("finish", () => clearTimeout(timeout));
@@ -232,9 +227,7 @@ export function createApp() {
   app.use("/api/v1", apiRouter);
 
   app.use((req, res) => {
-    res
-      .status(404)
-      .json({ error: "Not found", code: "NOT_FOUND", requestId: req.requestId });
+    res.status(404).json({ error: "Not found", code: "NOT_FOUND", requestId: req.requestId });
   });
 
   if (process.env.DISABLE_SCHEDULED_BACKUPS !== "1") {
@@ -248,9 +241,7 @@ export function createApp() {
     const requestId = req.requestId;
 
     if (err instanceof AppError) {
-      res
-        .status(err.statusCode)
-        .json({ error: err.message, code: err.code ?? "APP_ERROR", requestId });
+      res.status(err.statusCode).json({ error: err.message, code: err.code ?? "APP_ERROR", requestId });
       return;
     }
 

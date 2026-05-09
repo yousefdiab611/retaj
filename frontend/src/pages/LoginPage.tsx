@@ -37,7 +37,9 @@ export function LoginPage() {
       const message = err instanceof Error ? err.message : "Login failed";
       if (/server connection issue|failed to fetch|network error|network request failed/i.test(message)) {
         setError("الخادم غير متصل");
-      } else if (/invalid username or password|INVALID_CREDENTIALS|Invalid username or password/i.test(message)) {
+      } else if (
+        /invalid username or password|INVALID_CREDENTIALS|Invalid username or password/i.test(message)
+      ) {
         setError("اسم المستخدم أو كلمة المرور غير صحيحة");
       } else if (/not found/i.test(message)) {
         setError("Server connection issue");
@@ -56,7 +58,9 @@ export function LoginPage() {
           <BrandLogo className="mb-2" />
           <CardTitle className="text-xl font-semibold tracking-tight">Retaj Store</CardTitle>
           <CardDescription className="text-sm">ريتاج ستور</CardDescription>
-          <CardDescription className="text-sm">Log in to manage sales and inventory for your boutique.</CardDescription>
+          <CardDescription className="text-sm">
+            Log in to manage sales and inventory for your boutique.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">

@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { customerController } from "../controllers/customerController";
 import { requireAuth } from "../middleware/requireAuth";
 

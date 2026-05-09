@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import type { Prisma } from "@prisma/client";
 
-import { logger } from "./logger";
 import { DatabaseUnavailableError, isDatabaseConnectionError } from "./errors";
+import { logger } from "./logger";
+
+import type { Prisma } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { rawPrisma: PrismaClient | undefined };
 

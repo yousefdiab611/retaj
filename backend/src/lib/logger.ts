@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+
 import pino from "pino";
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -18,10 +19,18 @@ const targets = [] as Array<{
 }>;
 
 if (isDev && process.env.LOG_PRETTY !== "0") {
-  targets.push({ target: "pino-pretty", level: process.env.LOG_LEVEL ?? "debug", options: { colorize: true } });
+  targets.push({
+    target: "pino-pretty",
+    level: process.env.LOG_LEVEL ?? "debug",
+    options: { colorize: true },
+  });
 }
 
-targets.push({ target: "pino/file", level: process.env.LOG_LEVEL ?? (isDev ? "debug" : "info"), options: { destination: logFilePath } });
+targets.push({
+  target: "pino/file",
+  level: process.env.LOG_LEVEL ?? (isDev ? "debug" : "info"),
+  options: { destination: logFilePath },
+});
 
 export const logger = pino(
   {

@@ -27,24 +27,24 @@
 
 ## Environment matrix
 
-| Variable                    | API | Web | Desktop |
-| --------------------------- | --- | --- | ------- |
-| `DATABASE_URL`              | ✅  |     | (when local backend) |
-| `SHADOW_DATABASE_URL`       | ✅* |     |         |
-| `JWT_SECRET`                | ✅  |     | (passed to bundled backend) |
-| `ALLOWED_ORIGINS`           | ✅  |     |         |
-| `REDIS_URL`                 | ✅* |     |         |
-| `STRIPE_SECRET_KEY`         | ✅* |     |         |
-| `STRIPE_WEBHOOK_SECRET`     | ✅* |     |         |
-| `SENTRY_DSN`                | ✅* |     | ✅*     |
-| `LOG_LEVEL`                 | ✅  |     |         |
-| `LOG_FILE_PATH`             | ✅* |     |         |
-| `API_RATE_MAX` / `API_WRITE_MAX` | ✅* |  |        |
-| `AUTH_LOGIN_MAX_ATTEMPTS`   | ✅* |     |         |
-| `TRUST_PROXY=1`             | ✅* |     |         |
-| `VITE_API_URL`              |     | ✅  | (build time) |
-| `VITE_SENTRY_DSN`           |     | ✅* | ✅*     |
-| `UPDATE_SERVER_URL`         |     |     | ✅*     |
+| Variable                         | API  | Web  | Desktop                     |
+| -------------------------------- | ---- | ---- | --------------------------- |
+| `DATABASE_URL`                   | ✅   |      | (when local backend)        |
+| `SHADOW_DATABASE_URL`            | ✅\* |      |                             |
+| `JWT_SECRET`                     | ✅   |      | (passed to bundled backend) |
+| `ALLOWED_ORIGINS`                | ✅   |      |                             |
+| `REDIS_URL`                      | ✅\* |      |                             |
+| `STRIPE_SECRET_KEY`              | ✅\* |      |                             |
+| `STRIPE_WEBHOOK_SECRET`          | ✅\* |      |                             |
+| `SENTRY_DSN`                     | ✅\* |      | ✅\*                        |
+| `LOG_LEVEL`                      | ✅   |      |                             |
+| `LOG_FILE_PATH`                  | ✅\* |      |                             |
+| `API_RATE_MAX` / `API_WRITE_MAX` | ✅\* |      |                             |
+| `AUTH_LOGIN_MAX_ATTEMPTS`        | ✅\* |      |                             |
+| `TRUST_PROXY=1`                  | ✅\* |      |                             |
+| `VITE_API_URL`                   |      | ✅   | (build time)                |
+| `VITE_SENTRY_DSN`                |      | ✅\* | ✅\*                        |
+| `UPDATE_SERVER_URL`              |      |      | ✅\*                        |
 
 `✅` required, `✅*` recommended / context-dependent.
 

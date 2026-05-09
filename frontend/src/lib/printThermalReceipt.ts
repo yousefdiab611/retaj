@@ -1,7 +1,7 @@
-import type { InvoiceTransaction } from "@/types/invoice";
-
 import { BRAND_LOGO_FALLBACK_SRC, BRAND_LOGO_PRIMARY_SRC } from "./branding";
 import { generateQrCodeDataUrl } from "./qr";
+
+import type { InvoiceTransaction } from "@/types/invoice";
 
 /** Local-only receipt when the server is unavailable (queued for sync). */
 export type ThermalOfflineDraft = {
@@ -21,11 +21,7 @@ export type ThermalOfflineDraft = {
 };
 
 function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function money(n: number, currency: string): string {
@@ -36,20 +32,18 @@ function money(n: number, currency: string): string {
 export function printThermalReceipt(tx: InvoiceTransaction): void {
   const currency = tx.store.currency ?? "SAR";
   const cashierLabel = tx.cashier.username ?? tx.cashier.name;
-  const when = new Date(tx.createdAt).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   const cust = tx.customer
     ? `${esc(tx.customer.name)}${tx.customer.phone ? ` · ${esc(tx.customer.phone)}` : ""}`
     : "—";
 
-  const qrDataUrl = generateQrCodeDataUrl(JSON.stringify({
-    invoice: tx.reference,
-    date: tx.createdAt,
-    total: tx.total,
-    customer: tx.customer?.name ?? "",
-  }));
+  const qrDataUrl = generateQrCodeDataUrl(
+    JSON.stringify({
+      invoice: tx.reference,
+      date: tx.createdAt,
+      total: tx.total,
+      customer: tx.customer?.name ?? "",
+    }),
+  );
 
   const linesHtml = tx.lines
     .map(

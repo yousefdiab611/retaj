@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
 import { Search, Users, Edit3 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import type { CustomerRow } from "@/types/billing";
 
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchAdminCustomers, updateCustomerRequest } from "@/lib/api";
-import type { CustomerRow } from "@/types/billing";
 
 export function AdminCustomersPage() {
   const [customers, setCustomers] = useState<CustomerRow[]>([]);
@@ -163,11 +164,22 @@ export function AdminCustomersPage() {
                       <td className="py-2 pe-3 text-muted-foreground">{customer.email ?? "—"}</td>
                       <td className="py-2 pe-3 text-muted-foreground">{customer.phone ?? "—"}</td>
                       <td className="py-2 pe-3 tabular-nums">${customer.balance.toFixed(2)}</td>
-                      <td className="py-2 pe-3 tabular-nums text-muted-foreground">{customer.loyaltyPoints}</td>
-                      <td className="py-2 pe-3 text-muted-foreground">{customer.notes ? customer.notes.slice(0, 40) : "—"}</td>
-                      <td className="py-2 tabular-nums text-muted-foreground">{new Date(customer.createdAt).toLocaleDateString()}</td>
+                      <td className="py-2 pe-3 tabular-nums text-muted-foreground">
+                        {customer.loyaltyPoints}
+                      </td>
+                      <td className="py-2 pe-3 text-muted-foreground">
+                        {customer.notes ? customer.notes.slice(0, 40) : "—"}
+                      </td>
+                      <td className="py-2 tabular-nums text-muted-foreground">
+                        {new Date(customer.createdAt).toLocaleDateString()}
+                      </td>
                       <td className="py-2">
-                        <Button type="button" variant="outline" size="sm" onClick={() => openCustomerEditor(customer)}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openCustomerEditor(customer)}
+                        >
                           <Edit3 className="mr-2 h-3.5 w-3.5" />
                           Edit
                         </Button>
@@ -183,7 +195,9 @@ export function AdminCustomersPage() {
         <Dialog open={Boolean(selectedCustomer)} onOpenChange={(open) => !open && closeCustomerEditor()}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>{selectedCustomer ? `Edit ${selectedCustomer.name}` : "Edit customer"}</DialogTitle>
+              <DialogTitle>
+                {selectedCustomer ? `Edit ${selectedCustomer.name}` : "Edit customer"}
+              </DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div>

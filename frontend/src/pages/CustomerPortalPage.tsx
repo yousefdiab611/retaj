@@ -5,7 +5,13 @@ import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { fetchCustomerProfile, fetchCustomerSubscription, fetchCustomerDevices, fetchCustomerLicenses, sendSupportRequest } from "@/lib/api";
+import {
+  fetchCustomerProfile,
+  fetchCustomerSubscription,
+  fetchCustomerDevices,
+  fetchCustomerLicenses,
+  sendSupportRequest,
+} from "@/lib/api";
 
 export function CustomerPortalPage() {
   const [profile, setProfile] = useState<any>(null);
@@ -88,8 +94,12 @@ export function CustomerPortalPage() {
               <CardTitle>Devices</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p>{devices.length} authorized device{devices.length === 1 ? "" : "s"}</p>
-              <p className="text-sm text-muted-foreground">Most recent: {devices[0]?.updatedAt ? new Date(devices[0].updatedAt).toLocaleString() : "—"}</p>
+              <p>
+                {devices.length} authorized device{devices.length === 1 ? "" : "s"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Most recent: {devices[0]?.updatedAt ? new Date(devices[0].updatedAt).toLocaleString() : "—"}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -108,7 +118,10 @@ export function CustomerPortalPage() {
                 licenses.map((license) => (
                   <div key={license.id} className="rounded-md border border-border/60 p-3">
                     <div className="font-medium">{license.licenseKey}</div>
-                    <div className="text-xs text-muted-foreground">{license.status} • expires {license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : "never"}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {license.status} • expires{" "}
+                      {license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : "never"}
+                    </div>
                   </div>
                 ))
               )}
@@ -122,7 +135,11 @@ export function CustomerPortalPage() {
             <CardContent className="space-y-3">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-muted-foreground">Subject</label>
-                <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Ticket title" />
+                <Input
+                  value={subject}
+                  onChange={(event) => setSubject(event.target.value)}
+                  placeholder="Ticket title"
+                />
               </div>
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-muted-foreground">Details</label>
@@ -134,7 +151,12 @@ export function CustomerPortalPage() {
                   rows={5}
                 />
               </div>
-              <Button type="button" onClick={onSubmitSupport} disabled={!subject || !description} className="w-full gap-2">
+              <Button
+                type="button"
+                onClick={onSubmitSupport}
+                disabled={!subject || !description}
+                className="w-full gap-2"
+              >
                 <MessageSquare className="h-4 w-4" />
                 Submit request
               </Button>

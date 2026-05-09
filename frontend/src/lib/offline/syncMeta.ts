@@ -7,6 +7,10 @@ export async function setLastSyncAt(timestamp: number): Promise<void> {
 }
 
 export async function getLastSyncAt(): Promise<number | null> {
-  const result = await withOfflineStore<{ key: string; value: number } | undefined>(STORE, "readonly", (store) => store.get("lastSyncAt"));
+  const result = await withOfflineStore<{ key: string; value: number } | undefined>(
+    STORE,
+    "readonly",
+    (store) => store.get("lastSyncAt"),
+  );
   return result?.value ?? null;
 }

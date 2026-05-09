@@ -1,7 +1,8 @@
-import type { Request, Response } from "express";
+import { AuditActions } from "../constants/auditActions";
 import { prisma } from "../lib/prisma";
 import { writeAuditLog } from "../services/audit.service";
-import { AuditActions } from "../constants/auditActions";
+
+import type { Request, Response } from "express";
 
 export const customerController = {
   async getProfile(req: Request, res: Response) {
@@ -75,7 +76,10 @@ export const customerController = {
       res.status(400).json({ error: "Tenant context required", code: "TENANT_REQUIRED" });
       return;
     }
-    const result = await prisma.device.updateMany({ where: { id: deviceId ?? "", tenantId }, data: { isActive: false } });
+    const result = await prisma.device.updateMany({
+      where: { id: deviceId ?? "", tenantId },
+      data: { isActive: false },
+    });
     if (result.count === 0) {
       res.status(404).json({ error: "Device not found", code: "NOT_FOUND" });
       return;

@@ -97,7 +97,13 @@ export function ReportsPage() {
               <Label htmlFor="rep-to">To</Label>
               <Input id="rep-to" type="date" value={toStr} onChange={(e) => setToStr(e.target.value)} />
             </div>
-            <Button type="button" variant="outline" className="gap-2" onClick={() => void load()} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => void load()}
+              disabled={loading}
+            >
               <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
               Refresh
             </Button>

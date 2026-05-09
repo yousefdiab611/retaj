@@ -1,9 +1,12 @@
-import { Prisma, StockMovementType } from "@prisma/client";
+import { StockMovementType } from "@prisma/client";
 
 import { AuditActions } from "../../constants/auditActions";
 import { prisma } from "../../lib/prisma";
 import { writeAuditLog } from "../audit.service";
+
 import { syncProductTotalStock } from "./stockSync.service";
+
+import type { Prisma } from "@prisma/client";
 
 async function ensureProductBelongsToBranch(productId: string, branchId: string) {
   const p = await prisma.product.findFirst({

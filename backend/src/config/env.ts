@@ -18,7 +18,9 @@ export function assertProductionEnv(): void {
   }
 
   if (!process.env.SHADOW_DATABASE_URL) {
-    logger.warn("SHADOW_DATABASE_URL is missing in production; migrations will be skipped until a valid shadow database is configured");
+    logger.warn(
+      "SHADOW_DATABASE_URL is missing in production; migrations will be skipped until a valid shadow database is configured",
+    );
   } else if (!isPostgresUrl(process.env.SHADOW_DATABASE_URL)) {
     throw new Error("SHADOW_DATABASE_URL must use PostgreSQL in production");
   }

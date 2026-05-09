@@ -1,5 +1,6 @@
-import type { BillingStatus, SubscriptionPlan } from "@prisma/client";
 import { prisma } from "./prisma";
+
+import type { BillingStatus, SubscriptionPlan } from "@prisma/client";
 
 export const planLimits: Record<SubscriptionPlan, { users: number; branches: number; products: number }> = {
   FREE: { users: 3, branches: 1, products: 100 },
@@ -8,7 +9,10 @@ export const planLimits: Record<SubscriptionPlan, { users: number; branches: num
   ENTERPRISE: { users: 100, branches: 20, products: 10000 },
 };
 
-export function isBillingActive(status: BillingStatus | undefined, expiresAt: Date | null | undefined): boolean {
+export function isBillingActive(
+  status: BillingStatus | undefined,
+  expiresAt: Date | null | undefined,
+): boolean {
   if (!status || status !== "ACTIVE") return false;
   if (expiresAt && expiresAt.getTime() < Date.now()) return false;
   return true;

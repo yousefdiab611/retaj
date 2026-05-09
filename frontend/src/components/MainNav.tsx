@@ -1,14 +1,27 @@
-import { Building2, LayoutGrid, LogOut, Moon, Package, Receipt, ShieldCheck, ShoppingCart, Sun, Users, WifiOff } from "lucide-react";
-import type { ReactNode } from "react";
+import {
+  Building2,
+  LayoutGrid,
+  LogOut,
+  Moon,
+  Package,
+  Receipt,
+  ShieldCheck,
+  ShoppingCart,
+  Sun,
+  Users,
+  WifiOff,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { clearSession, getSelectedBranchId, getUser, setSelectedBranchId } from "@/lib/api";
 import { BRAND_LOGO_FALLBACK_SRC, BRAND_LOGO_PRIMARY_SRC } from "@/lib/branding";
-import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
-import { useOfflineSyncStatus } from "@/lib/offline/syncStatus";
 import { isDesktopApp } from "@/lib/electron";
+import { useOfflineSyncStatus } from "@/lib/offline/syncStatus";
+import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
 import { cn } from "@/lib/utils";
 
 type MainNavProps = {
@@ -30,11 +43,14 @@ export function MainNav({ endSlot }: MainNavProps) {
   const [isDesktop, setIsDesktop] = useState(false);
   const { pendingSales, pendingCustomers, lastSyncAt } = useOfflineSyncStatus();
   const canManageProducts =
-    user?.role === "ADMIN" || user?.role === "MANAGER" || user?.role === "TENANT_ADMIN" || user?.role === "SUPER_ADMIN";
-  const canManageBranches = user?.role === "ADMIN" || user?.role === "TENANT_ADMIN" || user?.role === "SUPER_ADMIN";
+    user?.role === "ADMIN" ||
+    user?.role === "MANAGER" ||
+    user?.role === "TENANT_ADMIN" ||
+    user?.role === "SUPER_ADMIN";
+  const canManageBranches =
+    user?.role === "ADMIN" || user?.role === "TENANT_ADMIN" || user?.role === "SUPER_ADMIN";
   const canManageTenants = user?.role === "SUPER_ADMIN";
-  const canPickBranch =
-    user?.role === "ADMIN" || user?.role === "MANAGER" || user?.role === "TENANT_ADMIN";
+  const canPickBranch = user?.role === "ADMIN" || user?.role === "MANAGER" || user?.role === "TENANT_ADMIN";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -203,9 +219,12 @@ export function MainNav({ endSlot }: MainNavProps) {
                 <span
                   className={cn(
                     "rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-                    user.role === "ADMIN" && "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:text-amber-100",
-                    user.role === "MANAGER" && "border-blue-500/60 bg-blue-500/10 text-blue-900 dark:text-blue-100",
-                    user.role === "CASHIER" && "border-emerald-500/60 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+                    user.role === "ADMIN" &&
+                      "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:text-amber-100",
+                    user.role === "MANAGER" &&
+                      "border-blue-500/60 bg-blue-500/10 text-blue-900 dark:text-blue-100",
+                    user.role === "CASHIER" &&
+                      "border-emerald-500/60 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
                   )}
                 >
                   {user.role}
@@ -214,11 +233,23 @@ export function MainNav({ endSlot }: MainNavProps) {
             </div>
           ) : null}
           {endSlot}
-          <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" onClick={toggleTheme}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground"
+            onClick={toggleTheme}
+          >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             <span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"}</span>
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" onClick={onLogout}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground"
+            onClick={onLogout}
+          >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Log out</span>
           </Button>

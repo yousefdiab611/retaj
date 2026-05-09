@@ -1,11 +1,23 @@
-import type { Request, Response } from "express";
-import type Stripe from "stripe";
-
-import { getBillingPlans, createSubscriptionDraft, recordPaymentForSubscription, activateSubscriptionForTenant, createLicenseForSubscription, getTenantSubscriptions, cancelSubscription } from "../services/subscription.service";
-import { createStripeCheckoutSession, verifyStripeWebhookSignature, getBillingPlan } from "../services/payment.service";
+import { AuditActions } from "../constants/auditActions";
 import { prisma } from "../lib/prisma";
 import { writeAuditLog } from "../services/audit.service";
-import { AuditActions } from "../constants/auditActions";
+import {
+  createStripeCheckoutSession,
+  verifyStripeWebhookSignature,
+  getBillingPlan,
+} from "../services/payment.service";
+import {
+  getBillingPlans,
+  createSubscriptionDraft,
+  recordPaymentForSubscription,
+  activateSubscriptionForTenant,
+  createLicenseForSubscription,
+  getTenantSubscriptions,
+  cancelSubscription,
+} from "../services/subscription.service";
+
+import type { Request, Response } from "express";
+import type Stripe from "stripe";
 
 export const billingController = {
   async getPlans(_req: Request, res: Response) {
@@ -36,7 +48,13 @@ export const billingController = {
       return;
     }
 
-    const session = await createStripeCheckoutSession({ tenantId, planKey, successUrl, cancelUrl, customerEmail });
+    const session = await createStripeCheckoutSession({
+      tenantId,
+      planKey,
+      successUrl,
+      cancelUrl,
+      customerEmail,
+    });
     const draft = await createSubscriptionDraft({
       tenantId,
       planKey,
@@ -135,7 +153,9 @@ export const billingController = {
 
       if (session.payment_status === "paid") {
         await activateSubscriptionForTenant(tenantId, subscription.id);
-        const expireDate = new Date(Date.now() + (session.metadata?.planKey === "PRO_YEARLY" ? 365 : 30) * 24 * 60 * 60 * 1000);
+        const expireDate = new Date(
+          Date.now() + (session.metadata?.planKey === "PRO_YEARLY" ? 365 : 30) * 24 * 60 * 60 * 1000,
+        );
         await createLicenseForSubscription({
           subscriptionId: subscription.id,
           tenantId,

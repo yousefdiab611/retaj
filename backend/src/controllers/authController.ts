@@ -1,10 +1,10 @@
-import type { Request, Response } from "express";
-
 import { logger } from "../lib/logger";
-import { getClientIp, getUserAgent } from "../utils/requestMeta";
 import { isLoginBlocked } from "../lib/loginBlocker";
 import { loginWithPassword, logoutRefreshToken, refreshSession } from "../services/auth.service";
+import { getClientIp, getUserAgent } from "../utils/requestMeta";
 import { loginBodySchema, refreshTokenBodySchema } from "../validation/schemas";
+
+import type { Request, Response } from "express";
 
 export const authController = {
   async login(req: Request, res: Response) {

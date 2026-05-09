@@ -1,15 +1,16 @@
+import type { AdminDashboardStats, AuditLogRow, CustomerRow, LicenseRow } from "@/types/billing";
 import type { InvoiceTransaction } from "@/types/invoice";
 import type { Product } from "@/types/product";
 import type { AuthUser, BranchBrief } from "@/types/user";
-import type { AdminDashboardStats, AuditLogRow, CustomerRow, LicenseRow } from "@/types/billing";
+
+import { isDesktopApp } from "@/lib/electron";
+import { searchOfflineCustomers } from "@/lib/offline/customersDb";
 import {
   getCachedProducts,
   lookupCachedProductByCode,
   saveCachedProducts,
   setProductCacheTimestamp,
 } from "@/lib/offline/productsDb";
-import { searchOfflineCustomers } from "@/lib/offline/customersDb";
-import { isDesktopApp } from "@/lib/electron";
 
 const TOKEN_KEY = "retaj-store_access_token";
 const REFRESH_KEY = "retaj-store_refresh_token";
@@ -178,7 +179,7 @@ export async function apiFetch(
     applyBranchHeader(headers);
   }
   const { _retry, skipBranchHeader: _sb, ...restInit } = init;
-  let res = await fetch(apiUrl(path), { ...restInit, headers });
+  const res = await fetch(apiUrl(path), { ...restInit, headers });
   if (res.status === 401 && !_retry) {
     const refreshed = await tryRefreshAccessToken();
     if (refreshed) {
@@ -378,7 +379,11 @@ export type LicenseActivationResponse = {
   graceUntil?: string | null;
 };
 
-export async function activateLicense(licenseKey: string, deviceId: string, deviceFingerprint: string): Promise<LicenseActivationResponse> {
+export async function activateLicense(
+  licenseKey: string,
+  deviceId: string,
+  deviceFingerprint: string,
+): Promise<LicenseActivationResponse> {
   const res = await apiFetch("/api/licenses/activate", {
     method: "POST",
     body: JSON.stringify({ licenseKey, deviceId, deviceFingerprint }),
@@ -390,7 +395,11 @@ export async function activateLicense(licenseKey: string, deviceId: string, devi
   return res.json() as Promise<LicenseActivationResponse>;
 }
 
-export async function validateLicense(licenseKey: string, deviceId: string, deviceFingerprint: string): Promise<LicenseActivationResponse> {
+export async function validateLicense(
+  licenseKey: string,
+  deviceId: string,
+  deviceFingerprint: string,
+): Promise<LicenseActivationResponse> {
   const res = await apiFetch("/api/licenses/validate", {
     method: "POST",
     body: JSON.stringify({ licenseKey, deviceId, deviceFingerprint }),
@@ -419,20 +428,30 @@ export async function fetchAdminLogs(): Promise<{ logs: AuditLogRow[] }> {
   return res.json() as Promise<{ logs: AuditLogRow[] }>;
 }
 
-export async function fetchCustomerProfile(): Promise<{ user: AuthUser; tenant: { id: string; name: string; plan: string; billingStatus: string; planExpiresAt: string | null } }> {
+export async function fetchCustomerProfile(): Promise<{
+  user: AuthUser;
+  tenant: { id: string; name: string; plan: string; billingStatus: string; planExpiresAt: string | null };
+}> {
   const res = await apiFetch("/api/customer/me");
   if (!res.ok) {
     throw new Error(await readError(res));
   }
-  return res.json() as Promise<{ user: AuthUser; tenant: { id: string; name: string; plan: string; billingStatus: string; planExpiresAt: string | null } }>;
+  return res.json() as Promise<{
+    user: AuthUser;
+    tenant: { id: string; name: string; plan: string; billingStatus: string; planExpiresAt: string | null };
+  }>;
 }
 
-export async function fetchCustomerSubscription(): Promise<{ subscriptions: Array<{ id: string; plan: string; status: string; currentPeriodEnd: string | null }> }> {
+export async function fetchCustomerSubscription(): Promise<{
+  subscriptions: Array<{ id: string; plan: string; status: string; currentPeriodEnd: string | null }>;
+}> {
   const res = await apiFetch("/api/customer/me/subscription");
   if (!res.ok) {
     throw new Error(await readError(res));
   }
-  return res.json() as Promise<{ subscriptions: Array<{ id: string; plan: string; status: string; currentPeriodEnd: string | null }> }>;
+  return res.json() as Promise<{
+    subscriptions: Array<{ id: string; plan: string; status: string; currentPeriodEnd: string | null }>;
+  }>;
 }
 
 export async function fetchCustomerLicenses(): Promise<{ licenses: LicenseRow[] }> {
@@ -443,12 +462,16 @@ export async function fetchCustomerLicenses(): Promise<{ licenses: LicenseRow[] 
   return res.json() as Promise<{ licenses: LicenseRow[] }>;
 }
 
-export async function fetchCustomerDevices(): Promise<{ devices: Array<{ id: string; deviceId: string; type: string; isActive: boolean; updatedAt: string }> }> {
+export async function fetchCustomerDevices(): Promise<{
+  devices: Array<{ id: string; deviceId: string; type: string; isActive: boolean; updatedAt: string }>;
+}> {
   const res = await apiFetch("/api/customer/me/devices");
   if (!res.ok) {
     throw new Error(await readError(res));
   }
-  return res.json() as Promise<{ devices: Array<{ id: string; deviceId: string; type: string; isActive: boolean; updatedAt: string }> }>;
+  return res.json() as Promise<{
+    devices: Array<{ id: string; deviceId: string; type: string; isActive: boolean; updatedAt: string }>;
+  }>;
 }
 
 export async function sendSupportRequest(subject: string, description: string): Promise<void> {
@@ -730,7 +753,7 @@ export async function createAdminProduct(payload: {
 
 export async function updateAdminProduct(
   id: string,
-   payload: Partial<{
+  payload: Partial<{
     sku: string;
     name: string;
     barcode: string | null;

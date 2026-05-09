@@ -1,11 +1,11 @@
-import type { NextFunction, Request, Response } from "express";
-
 import { AuditActions } from "../constants/auditActions";
-import { prisma } from "../lib/prisma";
-import { writeAuditLog } from "../services/audit.service";
 import { verifyAccessToken } from "../lib/jwt";
 import { logger } from "../lib/logger";
+import { prisma } from "../lib/prisma";
+import { writeAuditLog } from "../services/audit.service";
 import { getClientIp, getUserAgent } from "../utils/requestMeta";
+
+import type { NextFunction, Request, Response } from "express";
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
@@ -20,7 +20,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
 
   // Log suspicious auth attempts
-  if (token.length > 10000) { // Unusually long token
+  if (token.length > 10000) {
+    // Unusually long token
     logger.warn({ ip: getClientIp(req), userAgent: getUserAgent(req) }, "suspicious_token_length");
   }
 
@@ -62,7 +63,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     req.tenantPlan = user.tenant.plan;
     req.tenantBillingStatus = user.tenant.billingStatus;
     req.tenantPlanExpiresAt = user.tenant.planExpiresAt;
-    req.tenantRestricted = user.tenant.billingStatus !== "ACTIVE" ||
+    req.tenantRestricted =
+      user.tenant.billingStatus !== "ACTIVE" ||
       (!!user.tenant.planExpiresAt && user.tenant.planExpiresAt.getTime() < Date.now());
     next();
   } catch (err) {

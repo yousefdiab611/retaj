@@ -3,9 +3,9 @@ import fs from "fs";
 import path from "path";
 import { promisify } from "util";
 
-import { rawPrisma } from "./prisma";
-import { logger } from "./logger";
 import { isDatabaseConnectionError } from "./errors";
+import { logger } from "./logger";
+import { rawPrisma } from "./prisma";
 
 const execAsync = promisify(exec);
 const RECOVERY_INTERVAL_MS = Number(process.env.DB_RECOVERY_INTERVAL_MS ?? 10_000);
@@ -103,7 +103,8 @@ async function initializePostgres(): Promise<void> {
 }
 
 async function runPrismaBootstrap(): Promise<void> {
-  const schema = process.env.NODE_ENV === "production" ? "prisma/schema.postgresql.prisma" : "prisma/schema.prisma";
+  const schema =
+    process.env.NODE_ENV === "production" ? "prisma/schema.postgresql.prisma" : "prisma/schema.prisma";
   const cwd = process.cwd();
   logger.info({ schema }, "running Prisma bootstrap commands");
 

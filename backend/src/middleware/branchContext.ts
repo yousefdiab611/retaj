@@ -1,7 +1,8 @@
-import type { NextFunction, Request, Response } from "express";
 import { UserRole } from "@prisma/client";
 
 import { prisma } from "../lib/prisma";
+
+import type { NextFunction, Request, Response } from "express";
 
 /**
  * Resolves `req.activeBranchId` for the request.
@@ -31,7 +32,9 @@ export async function resolveActiveBranch(req: Request, res: Response, next: Nex
       select: { id: true },
     });
     if (!branch) {
-      res.status(403).json({ error: "Branch assignment invalid for tenant", code: "INVALID_BRANCH_ASSIGNMENT" });
+      res
+        .status(403)
+        .json({ error: "Branch assignment invalid for tenant", code: "INVALID_BRANCH_ASSIGNMENT" });
       return;
     }
     req.activeBranchId = branch.id;
@@ -40,8 +43,7 @@ export async function resolveActiveBranch(req: Request, res: Response, next: Nex
 
   const headerRaw = req.headers["x-branch-id"];
   const headerBid = typeof headerRaw === "string" ? headerRaw.trim() : "";
-  const queryBid =
-    typeof req.query.branchId === "string" ? req.query.branchId.trim() : "";
+  const queryBid = typeof req.query.branchId === "string" ? req.query.branchId.trim() : "";
 
   const requested = headerBid || queryBid || "";
   if (!requested) {

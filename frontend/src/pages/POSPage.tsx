@@ -15,6 +15,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { List } from "react-window";
 
+import type { Product } from "@/types/product";
+
 import { BarcodeScannerDialog } from "@/components/BarcodeScannerDialog";
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
@@ -44,18 +46,17 @@ import {
   type PaymentMethod as ApiPaymentMethod,
   type WarehouseBrief,
 } from "@/lib/api";
+import { TAX_RATE } from "@/lib/constants";
+import { loadCartState, saveCartState } from "@/lib/offline/cartRecovery";
+import { saveOfflineCustomer } from "@/lib/offline/customersDb";
 import { flushOfflineSalesQueue } from "@/lib/offline/flushOfflineQueue";
 import { enqueuePendingSale } from "@/lib/offline/pendingSalesDb";
-import { saveOfflineCustomer } from "@/lib/offline/customersDb";
-import { loadCartState, saveCartState } from "@/lib/offline/cartRecovery";
 import { getCachedProducts } from "@/lib/offline/productsDb";
 import { useOfflineSyncStatus } from "@/lib/offline/syncStatus";
 import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
 import { printThermalReceipt, printThermalReceiptOffline } from "@/lib/printThermalReceipt";
-import { TAX_RATE } from "@/lib/constants";
 import { uniqueCategories } from "@/lib/productUtils";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/types/product";
 
 type Locale = "en" | "ar";
 
@@ -122,7 +123,7 @@ const copy: Record<
     saleComplete: string;
     warehouse: string;
     warehouseHint: string;
- }
+  }
 > = {
   en: {
     pos: "Point of Sale",
@@ -457,7 +458,10 @@ export function POSPage() {
     return 1;
   }, [gridWidth]);
 
-  const rowCount = useMemo(() => Math.max(1, Math.ceil(filteredProducts.length / columnCount)), [filteredProducts.length, columnCount]);
+  const rowCount = useMemo(
+    () => Math.max(1, Math.ceil(filteredProducts.length / columnCount)),
+    [filteredProducts.length, columnCount],
+  );
 
   const addToCart = useCallback((product: Product) => {
     if (product.stockQty <= 0) return;
@@ -481,7 +485,14 @@ export function POSPage() {
   }, []);
 
   const renderProductRow = useCallback(
-    ({ index, style }: { ariaAttributes: { "aria-posinset": number; "aria-setsize": number; role: "listitem" }; index: number; style: React.CSSProperties }) => {
+    ({
+      index,
+      style,
+    }: {
+      ariaAttributes: { "aria-posinset": number; "aria-setsize": number; role: "listitem" };
+      index: number;
+      style: React.CSSProperties;
+    }) => {
       const start = index * columnCount;
       const items = filteredProducts.slice(start, start + columnCount);
       return (
@@ -524,10 +535,23 @@ export function POSPage() {
         </div>
       );
     },
-    [addToCart, cart, columnCount, filteredProducts, lastAddedProductId, locale, t.add, t.outOfStock, t.stock],
+    [
+      addToCart,
+      cart,
+      columnCount,
+      filteredProducts,
+      lastAddedProductId,
+      locale,
+      t.add,
+      t.outOfStock,
+      t.stock,
+    ],
   );
 
-  const listHeight = useMemo(() => Math.max(400, typeof window !== "undefined" ? window.innerHeight - 300 : 600), []);
+  const listHeight = useMemo(
+    () => Math.max(400, typeof window !== "undefined" ? window.innerHeight - 300 : 600),
+    [],
+  );
 
   const discount = useMemo(() => {
     const n = Number.parseFloat(discountInput.replace(/,/g, "."));
@@ -588,8 +612,10 @@ export function POSPage() {
     setCheckoutError(null);
     setCheckoutLoading(true);
     const idempotencyKey = crypto.randomUUID();
-    const customerLocalId = selectedCustomer?.localId ?? (selectedCustomer?.remoteId ? undefined : selectedCustomer?.id);
-    const customerRemoteId = selectedCustomer?.remoteId ?? (selectedCustomer?.localId ? undefined : selectedCustomer?.id);
+    const customerLocalId =
+      selectedCustomer?.localId ?? (selectedCustomer?.remoteId ? undefined : selectedCustomer?.id);
+    const customerRemoteId =
+      selectedCustomer?.remoteId ?? (selectedCustomer?.localId ? undefined : selectedCustomer?.id);
     const salePayload = {
       customerId: customerRemoteId ?? null,
       customerLocalId: customerLocalId ?? null,
@@ -771,8 +797,7 @@ export function POSPage() {
       setCustomerQuery("");
       setCustomerHits([]);
     } catch (e) {
-      const recoverable =
-        typeof navigator !== "undefined" && !navigator.onLine;
+      const recoverable = typeof navigator !== "undefined" && !navigator.onLine;
       if (recoverable) {
         const saved = await saveOfflineCustomer({
           name,
@@ -915,7 +940,13 @@ export function POSPage() {
           <div className="flex items-center justify-between border-b px-4 py-3">
             <h2 className="font-semibold">{t.cart}</h2>
             {cart.length > 0 && (
-              <Button type="button" variant="ghost" size="sm" onClick={clearCart} className="text-destructive">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearCart}
+                className="text-destructive"
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
@@ -929,8 +960,7 @@ export function POSPage() {
                 </li>
               ) : (
                 cart.map((line) => {
-                  const stock =
-                    products.find((p) => p.id === line.productId)?.stockQty ?? line.quantity;
+                  const stock = products.find((p) => p.id === line.productId)?.stockQty ?? line.quantity;
                   return (
                     <li key={line.productId}>
                       <Card>
@@ -1185,7 +1215,8 @@ export function POSPage() {
         onScan={(code) => void addByScannedCode(code)}
       />
 
-      <Dialog open={newCustomerOpen}
+      <Dialog
+        open={newCustomerOpen}
         onOpenChange={(o) => {
           setNewCustomerOpen(o);
           if (!o) setNcError(null);
@@ -1211,11 +1242,21 @@ export function POSPage() {
             </div>
             <div className="space-y-1">
               <Label htmlFor="nc-email">{t.ncEmail}</Label>
-              <Input id="nc-email" type="email" value={ncEmail} onChange={(e) => setNcEmail(e.target.value)} />
+              <Input
+                id="nc-email"
+                type="email"
+                value={ncEmail}
+                onChange={(e) => setNcEmail(e.target.value)}
+              />
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => setNewCustomerOpen(false)} disabled={ncSaving}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setNewCustomerOpen(false)}
+              disabled={ncSaving}
+            >
               {locale === "ar" ? "إلغاء" : "Cancel"}
             </Button>
             <Button type="button" onClick={() => void saveNewCustomer()} disabled={ncSaving}>
@@ -1278,7 +1319,12 @@ export function POSPage() {
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => setCheckoutOpen(false)} disabled={checkoutLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCheckoutOpen(false)}
+              disabled={checkoutLoading}
+            >
               {locale === "ar" ? "إلغاء" : "Cancel"}
             </Button>
             <Button type="button" onClick={() => void completeCheckout()} disabled={checkoutLoading}>

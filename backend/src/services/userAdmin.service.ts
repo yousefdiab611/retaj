@@ -1,6 +1,6 @@
-import { UserRole } from "@prisma/client";
-
 import { prisma } from "../lib/prisma";
+
+import type { UserRole } from "@prisma/client";
 
 export async function listUsersForAdmin(tenantId: string) {
   return prisma.user.findMany({

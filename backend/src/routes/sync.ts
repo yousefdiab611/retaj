@@ -1,8 +1,8 @@
 import { Router } from "express";
 
+import { getDatabaseStatus } from "../lib/dbBootstrap";
 import { processOfflineSyncBatch } from "../services/offlineSync.service";
 import { getClientIp, getUserAgent } from "../utils/requestMeta";
-import { getDatabaseStatus } from "../lib/dbBootstrap";
 import { offlineSyncBodySchema } from "../validation/schemas";
 
 export const syncRouter = Router();

@@ -1,6 +1,9 @@
 import { prisma } from "../lib/prisma";
-import { billingPlans, BillingPlanDefinition } from "./payment.service";
+
 import { createLicenseRecord } from "./license.service";
+import { billingPlans } from "./payment.service";
+
+import type { BillingPlanDefinition } from "./payment.service";
 import type { Prisma } from "@prisma/client";
 
 async function getOrCreateTenantBillingCustomer(tenantId: string) {
@@ -48,7 +51,12 @@ export async function createSubscriptionDraft(params: {
     data: {
       tenantId: params.tenantId,
       customerId: await getOrCreateTenantBillingCustomer(params.tenantId),
-      plan: params.planKey === "ENTERPRISE" ? "ENTERPRISE" : (params.planKey === "PRO" || params.planKey === "PRO_YEARLY" ? "PRO" : "FREE"),
+      plan:
+        params.planKey === "ENTERPRISE"
+          ? "ENTERPRISE"
+          : params.planKey === "PRO" || params.planKey === "PRO_YEARLY"
+            ? "PRO"
+            : "FREE",
       interval: params.interval === "YEARLY" ? "YEARLY" : params.interval === "MONTHLY" ? "MONTHLY" : "TRIAL",
       amountCents: params.amountCents,
       currency: params.currency,

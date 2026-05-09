@@ -108,7 +108,8 @@ customersRouter.post("/", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim() || null : null;
   const phone = normalizePhone(req.body?.phone);
   const notes = typeof req.body?.notes === "string" ? req.body.notes.trim() || null : null;
-  const loyaltyPoints = typeof req.body?.loyaltyPoints === "number" ? Math.max(0, Math.floor(req.body.loyaltyPoints)) : undefined;
+  const loyaltyPoints =
+    typeof req.body?.loyaltyPoints === "number" ? Math.max(0, Math.floor(req.body.loyaltyPoints)) : undefined;
 
   let customer = null;
   if (phone) {
@@ -180,7 +181,8 @@ customersRouter.patch("/:id", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim() || null : undefined;
   const phone = req.body?.phone === undefined ? undefined : normalizePhone(req.body?.phone);
   const notes = typeof req.body?.notes === "string" ? req.body.notes.trim() || null : undefined;
-  const loyaltyPoints = typeof req.body?.loyaltyPoints === "number" ? Math.max(0, Math.floor(req.body.loyaltyPoints)) : undefined;
+  const loyaltyPoints =
+    typeof req.body?.loyaltyPoints === "number" ? Math.max(0, Math.floor(req.body.loyaltyPoints)) : undefined;
 
   const updateData: Record<string, unknown> = {};
   if (name !== undefined) updateData.name = name;

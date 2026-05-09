@@ -1,6 +1,6 @@
-import type { UserRole } from "@prisma/client";
-
 import { prisma } from "../lib/prisma";
+
+import type { UserRole } from "@prisma/client";
 
 export async function getTransactionForInvoice(
   transactionId: string,
@@ -30,7 +30,9 @@ export async function getTransactionForInvoice(
       lineItems: {
         include: {
           product: { select: { id: true, sku: true, name: true, barcode: true } },
-          productVariant: { select: { id: true, sku: true, barcode: true, size: true, color: true, priceOverride: true } },
+          productVariant: {
+            select: { id: true, sku: true, barcode: true, size: true, color: true, priceOverride: true },
+          },
         },
         orderBy: { id: "asc" },
       },
@@ -95,9 +97,10 @@ export async function getTransactionForInvoice(
       id: l.id,
       productId: l.productId,
       sku: l.productVariant?.sku ?? l.product.sku,
-      name: l.productVariant?.size || l.productVariant?.color
-        ? `${l.product.name} ${[l.productVariant?.size, l.productVariant?.color].filter(Boolean).join(" /")}`
-        : l.product.name,
+      name:
+        l.productVariant?.size || l.productVariant?.color
+          ? `${l.product.name} ${[l.productVariant?.size, l.productVariant?.color].filter(Boolean).join(" /")}`
+          : l.product.name,
       barcode: l.productVariant?.barcode ?? l.product.barcode,
       quantity: l.quantity,
       unitPrice: Number(l.unitPrice),

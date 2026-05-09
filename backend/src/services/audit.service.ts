@@ -1,8 +1,8 @@
-import type { Prisma } from "@prisma/client";
-
 import { AuditActions, type AuditAction } from "../constants/auditActions";
-import { prisma } from "../lib/prisma";
 import { logger } from "../lib/logger";
+import { prisma } from "../lib/prisma";
+
+import type { Prisma } from "@prisma/client";
 
 type LogParams = {
   action: AuditAction;

@@ -1,7 +1,7 @@
 ﻿import { exec as execCb } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 import { promisify } from "util";
 
 import { prisma } from "../lib/prisma";
@@ -128,7 +128,10 @@ export class BackupService {
       if (process.env.DEFAULT_TENANT_ID) {
         return process.env.DEFAULT_TENANT_ID;
       }
-      const tenant = await prisma.tenant.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" } });
+      const tenant = await prisma.tenant.findFirst({
+        where: { isActive: true },
+        orderBy: { createdAt: "asc" },
+      });
       return tenant?.id ?? null;
     };
 

@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import type { Request, Response } from "express";
 
 import {
   createAdminProduct,
@@ -9,6 +8,8 @@ import {
 } from "../services/adminProduct.service";
 import { getClientIp, getUserAgent, firstPathParam } from "../utils/requestMeta";
 import { adminProductCreateSchema, adminProductPatchSchema } from "../validation/schemas";
+
+import type { Request, Response } from "express";
 
 export const adminProductController = {
   async list(req: Request, res: Response) {

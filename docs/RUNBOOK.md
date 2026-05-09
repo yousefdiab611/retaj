@@ -4,12 +4,12 @@
 
 ## 1. Health probes
 
-| URL                   | Meaning                          | Expected response                  |
-| --------------------- | -------------------------------- | ---------------------------------- |
-| `GET /health`         | Liveness, no DB                  | `{"ok":true,"service":"retaj-store-api"}` |
-| `GET /api/ready`      | Readiness (DB online)            | 200 with `database: "connected"`   |
-| `GET /api/status`     | Detailed (sync engine, provider) | JSON with `syncEngineStatus`       |
-| `GET /healthz` (web)  | nginx static probe               | `ok`                               |
+| URL                  | Meaning                          | Expected response                         |
+| -------------------- | -------------------------------- | ----------------------------------------- |
+| `GET /health`        | Liveness, no DB                  | `{"ok":true,"service":"retaj-store-api"}` |
+| `GET /api/ready`     | Readiness (DB online)            | 200 with `database: "connected"`          |
+| `GET /api/status`    | Detailed (sync engine, provider) | JSON with `syncEngineStatus`              |
+| `GET /healthz` (web) | nginx static probe               | `ok`                                      |
 
 Datadog / Cloud Run / ECS configurations should target `/api/ready` for
 readiness and `/health` for liveness.
@@ -23,7 +23,7 @@ readiness and `/health` for liveness.
 3. If Postgres is healthy, look at `logs/retaj-api.log` for
    `prisma_connection_unavailable`.
 4. Restart the API: `pm2 restart retaj-api` (or `kubectl rollout
-   restart deployment/retaj-api`).
+restart deployment/retaj-api`).
 
 ### "Login attempts spiking"
 
@@ -88,13 +88,13 @@ drop/recreate tables. Only `migrate deploy` is safe.
 
 ## 5. Disaster recovery
 
-| Scenario                     | RPO    | RTO   | Action |
-| ---------------------------- | ------ | ----- | ------ |
-| API container crash loop     | 0      | 5 min | `pm2 restart` / k8s rollback to previous image |
-| Postgres node failure        | 5 min  | 30 min| Promote read replica or restore last `pg_dump` |
-| Region-wide outage           | 1 h    | 4 h   | Spin up secondary region from latest backup; flip DNS |
-| Compromised JWT secret       | n/a    | 30 min| Rotate `JWT_SECRET`, force-revoke all refresh tokens (`UPDATE refresh_tokens SET revoked_at = NOW();`), redeploy |
-| Compromised Stripe key       | 0      | 15 min| Roll key in dashboard, redeploy, audit `Payment` rows since the leak window |
+| Scenario                 | RPO   | RTO    | Action                                                                                                           |
+| ------------------------ | ----- | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| API container crash loop | 0     | 5 min  | `pm2 restart` / k8s rollback to previous image                                                                   |
+| Postgres node failure    | 5 min | 30 min | Promote read replica or restore last `pg_dump`                                                                   |
+| Region-wide outage       | 1 h   | 4 h    | Spin up secondary region from latest backup; flip DNS                                                            |
+| Compromised JWT secret   | n/a   | 30 min | Rotate `JWT_SECRET`, force-revoke all refresh tokens (`UPDATE refresh_tokens SET revoked_at = NOW();`), redeploy |
+| Compromised Stripe key   | 0     | 15 min | Roll key in dashboard, redeploy, audit `Payment` rows since the leak window                                      |
 
 ## 6. Useful commands
 

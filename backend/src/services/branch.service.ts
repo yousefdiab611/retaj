@@ -1,7 +1,8 @@
-import type { UserRole } from "@prisma/client";
-
 import { prisma } from "../lib/prisma";
+
 import { reportTopMovingProducts } from "./inventory/inventoryReports.service";
+
+import type { UserRole } from "@prisma/client";
 
 export type BranchRow = {
   id: string;
@@ -11,7 +12,13 @@ export type BranchRow = {
   createdAt: string;
 };
 
-function mapBranch(b: { id: string; name: string; address: string | null; phone: string | null; createdAt: Date }): BranchRow {
+function mapBranch(b: {
+  id: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  createdAt: Date;
+}): BranchRow {
   return {
     id: b.id,
     name: b.name,
