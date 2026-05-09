@@ -21,9 +21,16 @@ function getApiBaseUrl(): string {
   const raw = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
   if (raw) return raw.replace(/\/$/, "");
   if (typeof window !== "undefined") {
+    // The Electron preload script forwards the chosen backend port via
+    // a global so the renderer doesn't have to guess (and so we don't
+    // collide with whatever the user already has on :3001).
+    const desktopBoot = (window as unknown as { __RETAJ_BOOT__?: { apiBaseUrl?: string | null } }).__RETAJ_BOOT__;
+    if (desktopBoot?.apiBaseUrl) {
+      return desktopBoot.apiBaseUrl.replace(/\/$/, "");
+    }
     const protocol = window.location.protocol;
     if (protocol === "file:" || isDesktopApp()) {
-      return "http://localhost:3001";
+      return "http://127.0.0.1:38217";
     }
   }
   return "";

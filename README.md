@@ -62,6 +62,19 @@ Pushing a `v*.*.*` tag triggers `desktop-release.yml`, which builds
 installers on Windows/macOS/Linux runners and publishes them to a
 GitHub Release.
 
+## Standalone Windows desktop
+
+The repo also ships an Electron-based **standalone Windows installer**
+that bundles the backend (Node + Prisma) and an embedded SQLite
+database — no Postgres install required on the end-user's machine.
+The full build / packaging story lives in
+[`docs/DESKTOP_WINDOWS.md`](docs/DESKTOP_WINDOWS.md). TL;DR:
+
+```bash
+# tag a release → GitHub Actions builds the .exe automatically
+git tag v1.2.0 && git push origin v1.2.0
+```
+
 ## Documentation map
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — services, data flow,

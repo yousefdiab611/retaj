@@ -9,6 +9,11 @@ on:
       release_tag:
         description: "Optional tag for this manual build (e.g. v1.2.0)"
         required: false
+      windows_only:
+        description: "Build only the Windows installer"
+        required: false
+        default: "true"
+        type: string
 
 permissions:
   contents: write
@@ -23,16 +28,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            artifact: linux
-            script: build:desktop:linux
-          - os: macos-latest
-            artifact: macos
-            script: build:desktop:mac
           - os: windows-latest
             artifact: windows
             script: build:desktop:win
+            always: true
+          - os: macos-latest
+            artifact: macos
+            script: build:desktop:mac
+            always: false
+          - os: ubuntu-latest
+            artifact: linux
+            script: build:desktop:linux
+            always: false
     runs-on: ${{ matrix.os }}
+    # Always build Windows; build mac/linux only when explicitly requested
+    # (windows_only != "true") or when releasing via tag push.
+    if: |
+      matrix.always == true ||
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && (inputs.windows_only != 'true'))
     steps:
       - uses: actions/checkout@v4
 
@@ -40,30 +54,40 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            backend/package-lock.json
-            frontend/package-lock.json
 
       - name: Install root + workspace deps
         run: npm install --no-audit --no-fund
 
-      - name: Generate Prisma client
+      - name: Generate Postgres Prisma client (for backend type-check / build)
         working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/placeholder"
         run: npx prisma generate --schema prisma/schema.prisma
 
-      - name: Build backend (TypeScript)
-        run: npm run build --workspace backend
+      - name: Stage standalone backend bundle (Windows binary engine)
+        working-directory: frontend
+        run: node scripts/stage-desktop-backend.cjs
 
       - name: Build desktop bundle
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS code signing (optional)
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows code signing (optional)
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: npm run ${{ matrix.script }}
+
+      - name: List produced artefacts
+        if: always()
+        shell: bash
+        run: |
+          echo "--- dist-electron ---"
+          if [ -d dist-electron ]; then find dist-electron -maxdepth 4 -type f | sort; fi
 
       - name: Upload artefacts
         uses: actions/upload-artifact@v4
@@ -71,12 +95,14 @@ jobs:
           name: retaj-desktop-${{ matrix.artifact }}
           path: |
             dist-electron/**/*.exe
+            dist-electron/**/*.msi
             dist-electron/**/*.dmg
             dist-electron/**/*.zip
             dist-electron/**/*.AppImage
             dist-electron/**/*.deb
             dist-electron/**/latest*.yml
           if-no-files-found: warn
+          retention-days: 30
 
   release:
     name: Publish GitHub Release

@@ -14,12 +14,13 @@
     "test:watch": "vitest",
     "electron": "electron .",
     "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron-pack": "npm run build && electron-builder",
-    "electron-pack:current": "npm run build && electron-builder",
-    "electron-pack:win": "npm run build && electron-builder --win nsis portable --x64 --ia32",
-    "electron-pack:mac": "npm run build && electron-builder --mac dmg zip --x64 --arm64",
-    "electron-pack:linux": "npm run build && electron-builder --linux AppImage deb --x64",
-    "electron-pack:all": "npm run build && electron-builder -mwl"
+    "electron:stage-backend": "node scripts/stage-desktop-backend.cjs",
+    "electron-pack": "npm run build && npm run electron:stage-backend && electron-builder",
+    "electron-pack:current": "npm run build && npm run electron:stage-backend && electron-builder",
+    "electron-pack:win": "npm run build && npm run electron:stage-backend && electron-builder --win nsis portable --x64",
+    "electron-pack:mac": "npm run build && npm run electron:stage-backend && electron-builder --mac dmg zip --x64 --arm64",
+    "electron-pack:linux": "npm run build && npm run electron:stage-backend && electron-builder --linux AppImage deb --x64",
+    "electron-pack:all": "npm run build && npm run electron:stage-backend && electron-builder -mwl"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -77,24 +78,18 @@
       "public/retaj-icon.ico"
     ],
     "asar": true,
+    "asarUnpack": [
+      "**/node_modules/@prisma/**",
+      "**/node_modules/.prisma/**",
+      "**/node_modules/prisma/**"
+    ],
     "extraResources": [
       {
-        "from": "../backend/dist",
-        "to": "backend/dist",
+        "from": "../dist-electron-staging/backend",
+        "to": "backend",
         "filter": [
           "**/*"
         ]
-      },
-      {
-        "from": "../backend/node_modules",
-        "to": "backend/node_modules",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
-        "from": "../backend/package.json",
-        "to": "backend/package.json"
       }
     ],
     "win": {
