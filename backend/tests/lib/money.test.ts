@@ -15,9 +15,10 @@ describe("money helpers", () => {
       expect(roundMoney2(42)).toBe(42);
     });
 
-    it("handles negative amounts", () => {
-      expect(roundMoney2(-1.005)).toBeCloseTo(-1.0, 2);
+    it("handles negative amounts symmetrically (round half away from zero)", () => {
+      expect(roundMoney2(-1.005)).toBeCloseTo(-1.01, 2);
       expect(roundMoney2(-99.999)).toBe(-100);
+      expect(roundMoney2(-2.5)).toBe(-2.5);
     });
   });
 

@@ -1,5 +1,13 @@
 export function roundMoney2(n: number): number {
-  return Math.round(n * 100) / 100;
+  // IEEE-754 binary representation means values like 1.005 are stored as
+  // 1.00499999..., so a naive Math.round(n * 100) silently truncates a
+  // halalala from every receipt. We absorb that ULP error by re-scaling
+  // through an intermediate higher-precision rounding step before the
+  // final 2-decimal round.
+  if (!Number.isFinite(n) || n === 0) return 0;
+  const sign = n < 0 ? -1 : 1;
+  const scaled = Math.round(Math.abs(n) * 1e10) / 1e8;
+  return (sign * Math.round(scaled)) / 100;
 }
 
 export function toDecimalString(n: number): string {
