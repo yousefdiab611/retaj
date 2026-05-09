@@ -1,0 +1,56 @@
+# Production overlay. Run alongside docker-compose.yml:
+#
+#   docker compose \
+#     -f infra/docker-compose.yml \
+#     -f infra/docker-compose.prod.yml \
+#     --profile app up -d
+#
+# Secrets are expected to come from your orchestrator (Docker secrets,
+# Kubernetes, ECS task definitions, etc.) — this overlay only pins
+# images, deploy options and disables development-only behaviour.
+
+name: retaj-store
+
+services:
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  api:
+    image: ${API_IMAGE:-ghcr.io/yousefdiab611/retaj-api:latest}
+    build: null
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      ENABLE_API_DOCS: "0"
+      DISABLE_SCHEDULED_BACKUPS: "0"
+    deploy:
+      replicas: ${API_REPLICAS:-2}
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+
+  web:
+    image: ${WEB_IMAGE:-ghcr.io/yousefdiab611/retaj-web:latest}
+    build: null
+    deploy:
+      replicas: ${WEB_REPLICAS:-2}
+      resources:
+        limits:
+          memory: 128M

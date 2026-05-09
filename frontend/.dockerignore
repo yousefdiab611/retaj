@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.dockerignore
+Dockerfile
+*.log
+README.md
+electron
+dist-electron
