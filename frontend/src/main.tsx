@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import App from "./App.tsx";
 import { preloadBrandLogo } from "./lib/branding";
+import { initSentry } from "./lib/sentry";
 import "./index.css";
 
 function applyInitialTheme() {
@@ -13,6 +14,7 @@ function applyInitialTheme() {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
+void initSentry();
 preloadBrandLogo();
 applyInitialTheme();
 

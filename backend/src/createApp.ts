@@ -9,9 +9,10 @@ import { UserRole } from "@prisma/client";
 import { getCorsOrigin } from "./config/cors";
 import { billingController } from "./controllers/billingController";
 import { AppError } from "./http/AppError";
-import { logger } from "./lib/logger";
 import { getDatabaseStatus, isDatabaseOnline } from "./lib/dbBootstrap";
 import { isDatabaseUnavailableError } from "./lib/errors";
+import { logger } from "./lib/logger";
+import { sentryErrorHandler, sentryRequestHandler } from "./lib/observability";
 import { resolveActiveBranch, requireBranchSelected } from "./middleware/branchContext";
 import { apiRateLimiter, sensitiveWriteRateLimiter } from "./middleware/rateLimits";
 import { requestContext } from "./middleware/requestContext";
@@ -113,6 +114,7 @@ export function createApp() {
   }
 
   app.use(requestContext);
+  app.use(sentryRequestHandler());
 
   app.use(
     helmet({
@@ -234,6 +236,8 @@ export function createApp() {
     const backupService = new BackupService();
     backupService.scheduleBackups();
   }
+
+  app.use(sentryErrorHandler());
 
   app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
     const requestId = req.requestId;

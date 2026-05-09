@@ -5,6 +5,7 @@ import { assertProductionEnv, validateDevelopmentEnv } from "./config/env";
 import { createApp } from "./createApp";
 import { initDatabaseBootstrap, getDatabaseStatus } from "./lib/dbBootstrap";
 import { logger } from "./lib/logger";
+import { initObservability } from "./lib/observability";
 import { rawPrisma } from "./lib/prisma";
 
 const envFile = process.env.NODE_ENV === "production" ? ".env.production" : ".env.development";
@@ -20,6 +21,7 @@ validateDevelopmentEnv();
 const SHUTDOWN_TIMEOUT_MS = Number(process.env.SHUTDOWN_TIMEOUT_MS ?? 25_000);
 
 async function main(): Promise<void> {
+  initObservability();
   await initDatabaseBootstrap();
   const status = getDatabaseStatus();
   logger.info({ dbStatus: status }, "startup_health_check");
