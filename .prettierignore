@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+out
+coverage
+dist-electron
+**/.next
+**/.turbo
+**/*.min.*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+backend/prisma/migrations/**/*.sql
+backend/dist
+frontend/dist
+mobile_cashier/build
+mobile_cashier/.dart_tool

@@ -7,11 +7,18 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
     "electron": "electron .",
     "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron-pack": "npm run build && electron-builder --win nsis",
-    "electron-pack-win": "npm run build && electron-builder --win nsis",
-    "electron-pack-win-portable": "npm run build && electron-builder --win portable"
+    "electron-pack": "npm run build && electron-builder",
+    "electron-pack:current": "npm run build && electron-builder",
+    "electron-pack:win": "npm run build && electron-builder --win nsis portable --x64 --ia32",
+    "electron-pack:mac": "npm run build && electron-builder --mac dmg zip --x64 --arm64",
+    "electron-pack:linux": "npm run build && electron-builder --linux AppImage deb --x64",
+    "electron-pack:all": "npm run build && electron-builder -mwl"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -95,6 +102,27 @@
       ],
       "icon": "public/retaj-icon.ico"
     },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.business",
+      "icon": "public/retaj-icon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "artifactName": "Retaj-Store-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ],
+      "category": "Office",
+      "icon": "public/retaj-icon.png",
+      "maintainer": "Retaj Store <support@retaj.local>",
+      "artifactName": "Retaj-Store-${version}-${arch}.${ext}"
+    },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
@@ -105,6 +133,10 @@
       "shortcutName": "Retaj Store",
       "artifactName": "Retaj-Store-Setup-${version}.${ext}"
     },
+    "dmg": {
+      "title": "Retaj Store ${version}",
+      "icon": "public/retaj-icon.png"
+    },
     "portable": {
       "artifactName": "Retaj-POS-Portable-${version}.${ext}",
       "requestExecutionLevel": "user"
@@ -112,7 +144,8 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "${UPDATE_SERVER_URL}"
+        "url": "${UPDATE_SERVER_URL}",
+        "channel": "latest"
       }
     ]
   }

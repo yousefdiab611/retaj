@@ -1,13 +1,52 @@
 {
-  "scripts": {
-    "backend:dev": "npm --prefix backend run dev",
-    "backend:start": "npm --prefix backend run start",
-    "backend:db:generate": "npm --prefix backend run db:generate",
-    "backend:db:migrate": "npm --prefix backend run db:migrate",
-    "backend:db:studio": "npm --prefix backend run db:studio"
+  "name": "retaj-store",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Retaj Store — multi-tenant POS, inventory, billing & desktop app monorepo",
+  "engines": {
+    "node": ">=20.18.0",
+    "npm": ">=10.0.0"
   },
-  "dependencies": {
-    "react-window": "^2.2.7",
-    "stripe": "^22.1.0"
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "prepare": "husky || true",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html}\" --ignore-path .gitignore",
+    "lint": "eslint . --ext .ts,.tsx,.js,.cjs,.mjs --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.cjs,.mjs --fix",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "dev:desktop": "npm --workspace frontend run electron-dev",
+    "build:desktop": "npm --workspace frontend run electron-pack:current",
+    "build:desktop:win": "npm --workspace frontend run electron-pack:win",
+    "build:desktop:mac": "npm --workspace frontend run electron-pack:mac",
+    "build:desktop:linux": "npm --workspace frontend run electron-pack:linux",
+    "db:migrate": "npm --workspace backend run db:migrate",
+    "db:seed": "npm --workspace backend run db:seed",
+    "db:studio": "npm --workspace backend run db:studio",
+    "docker:up": "docker compose -f infra/docker-compose.yml up -d",
+    "docker:down": "docker compose -f infra/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.10.0",
+    "@typescript-eslint/parser": "^8.10.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.13",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
   }
 }
