@@ -17,9 +17,9 @@
     "electron:stage-backend": "node scripts/stage-desktop-backend.cjs",
     "electron-pack": "npm run build && npm run electron:stage-backend && electron-builder",
     "electron-pack:current": "npm run build && npm run electron:stage-backend && electron-builder",
-    "electron-pack:win": "npm run build && npm run electron:stage-backend && electron-builder --win nsis portable --x64",
-    "electron-pack:mac": "npm run build && npm run electron:stage-backend && electron-builder --mac dmg zip --x64 --arm64",
-    "electron-pack:linux": "npm run build && npm run electron:stage-backend && electron-builder --linux AppImage deb --x64",
+    "electron-pack:win": "npm run build && npm run electron:stage-backend && electron-builder --win nsis portable --x64 --publish never",
+    "electron-pack:mac": "npm run build && npm run electron:stage-backend && electron-builder --mac dmg zip --x64 --arm64 --publish never",
+    "electron-pack:linux": "npm run build && npm run electron:stage-backend && electron-builder --linux AppImage deb --x64 --publish never",
     "electron-pack:all": "npm run build && npm run electron:stage-backend && electron-builder -mwl"
   },
   "dependencies": {
@@ -173,9 +173,11 @@
     },
     "publish": [
       {
-        "provider": "generic",
-        "url": "${UPDATE_SERVER_URL}",
-        "channel": "latest"
+        "provider": "github",
+        "owner": "yousefdiab611",
+        "repo": "retaj",
+        "channel": "latest",
+        "publishAutoUpdate": true
       }
     ]
   }
