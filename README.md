@@ -1,251 +1,82 @@
-# 🎯 RETAJ STORE - FULL PROJECT RUN SYSTEM
+# Retaj Store
 
-## ✅ Complete Automation Solution
+Multi-tenant Point-of-Sale, inventory, billing and licensing platform with
+web, **desktop** (Windows/macOS/Linux via Electron) and mobile (Flutter)
+clients backed by a Node.js + Prisma + PostgreSQL API.
 
-A production-ready, cross-platform build system for the entire **Retaj Store Management System** - Backend, Frontend, and Mobile.
+| Workspace          | Stack                                              | Path                |
+| ------------------ | -------------------------------------------------- | ------------------- |
+| API server         | Node 20, Express, Prisma, Zod, pino, JWT, helmet   | `backend/`          |
+| Web + desktop UI   | React 18, Vite, Tailwind, Radix, Electron 28       | `frontend/`         |
+| Mobile cashier     | Flutter 3, sqflite, secure_storage                 | `mobile_cashier/`   |
+| Containers         | Docker (api + web), docker-compose for the stack   | `infra/`, `*/Dockerfile` |
+| CI / release       | GitHub Actions (CI, CodeQL, desktop release)       | `.github/`          |
 
----
+## Quick start (local development)
 
-## 🚀 Get Started in 30 Seconds
+> Pre-requisites: Node 20.18 (`nvm use`), Docker (for Postgres + Redis), npm 10+.
 
-### 1. Create Database
-```sql
-CREATE USER retaj_user WITH PASSWORD 'RetajPass123!';
-CREATE DATABASE retaj_db OWNER retaj_user;
-```
-
-### 2. Run Build
-```powershell
-.\run-all.ps1
-```
-
-### 3. Install Desktop App
-- Locate: `d:\retaj\dist-electron\RetajPOS Setup X.X.X.exe`
-- Run the installer
-- Desktop app will auto-start backend and frontend
-
-### 4. Login
-- **URL:** http://localhost:5173
-- **Username:** `ahmed`
-- **Password:** `ahmed123`
-
----
-
-## 📚 Documentation (Pick Your Path)
-
-### ⚡ Quick (5 min)
-👉 **[QUICK_START.md](QUICK_START.md)** - Essential commands and setup
-
-### 🎓 Complete (15 min)
-👉 **[SYSTEM_COMPLETE.md](SYSTEM_COMPLETE.md)** - Full overview and architecture
-
-### 🔧 Technical (Details)
-👉 **[RUN_SYSTEM_README.md](RUN_SYSTEM_README.md)** - Build system internals
-
-### 🗄️ Database (Setup)
-👉 **[CREDENTIALS_AND_SETUP.md](CREDENTIALS_AND_SETUP.md)** - Database and user credentials
-
-### 🗺️ Navigation
-👉 **[INDEX.md](INDEX.md)** - Complete file index and navigation guide
-
-### 📋 Delivery
-👉 **[DELIVERY_SUMMARY.md](DELIVERY_SUMMARY.md)** - What was delivered and tested
-
----
-
-## 🎯 What You Get
-
-| Component | Status | File |
-|-----------|--------|------|
-| **PowerShell Script** | ✅ Ready | `run-all.ps1` |
-| **Batch Script** | ✅ Ready | `run-all.bat` |
-| **Bash Script** | ✅ Ready | `run-all.sh` |
-| **Backend Config** | ✅ Ready | `backend/.env` |
-| **Frontend Config** | ✅ Ready | `frontend/.env` |
-| **Documentation** | ✅ Ready | 6 markdown files |
-| **Build System** | ✅ Tested | 18.58 seconds |
-
----
-
-## 🔥 Key Features
-
-✨ **One Command Build**
-- Backend, Frontend, Mobile all in one command
-- Automatic dependency installation
-- Production-grade compilation
-
-🎨 **Beautiful Output**
-- Color-coded messages (green/red/cyan/yellow)
-- Step-by-step progress tracking
-- Comprehensive error reporting
-
-🛡️ **Robust Error Handling**
-- Individual module failures don't stop the build
-- Clear error logging per component
-- Graceful fallback mechanisms
-
-📦 **Cross-Platform**
-- Windows (PowerShell & Batch)
-- macOS (Bash)
-- Linux (Bash)
-
----
-
-## 📊 Build System
-
-### What It Does
-
-```
-Step 1: Backend
-  ✓ npm install (if needed)
-  ✓ npx prisma generate
-  ✓ npm run build
-  → Output: backend/dist/
-
-Step 2: Frontend
-  ✓ npm install (if needed)
-  ✓ npm run build
-  → Output: frontend/dist/
-
-Step 3: Mobile (optional)
-  ✓ flutter pub get
-  ✓ flutter build apk --release
-  → Output: mobile_cashier/build/
-
-Step 4: Summary
-  ✓ Module status
-  ✓ Execution time
-  ✓ Build paths
-```
-
-### Speed
-
-- Backend: 30-60 seconds
-- Frontend: 20-40 seconds
-- Total (without mobile): ~2-3 minutes
-
----
-
-## 🔐 Credentials
-
-### Database (Required Setup)
-```
-User: retaj_user
-Password: RetajPass123!
-Database: retaj_db
-Host: localhost
-Port: 5432
-```
-
-### Test Users (After `npm run db:seed`)
-```
-Admin:
-  Username: ahmed
-  Password: ahmed123
-
-Cashier:
-  Username: ahmed
-  Password: ahmed123
-```
-
----
-
-## 📁 Project Structure
-
-```
-d:\retaj/
-├── ⚙️ run-all.ps1              PowerShell script
-├── ⚙️ run-all.bat              Batch script
-├── ⚙️ run-all.sh               Bash script
-│
-├── 📖 QUICK_START.md           ⭐ Start here
-├── 📖 INDEX.md                 Navigation
-├── 📖 SYSTEM_COMPLETE.md       Full overview
-├── 📖 RUN_SYSTEM_README.md     Build details
-├── 📖 CREDENTIALS_AND_SETUP.md Database setup
-├── 📖 DELIVERY_SUMMARY.md      What was done
-│
-├── 📦 backend/
-│   ├── .env                    Configured
-│   ├── src/
-│   └── dist/                   Build output
-│
-├── 📦 frontend/
-│   ├── .env                    Configured
-│   ├── src/
-│   └── dist/                   Build output
-│
-└── 📦 mobile_cashier/
-    ├── lib/
-    └── build/                  Build output
-```
-
----
-
-## 🎯 Common Tasks
-
-### Build Everything
-```powershell
-.\run-all.ps1
-```
-
-### Build (Skip Mobile - Faster)
-```powershell
-.\run-all.ps1 -SkipMobile
-```
-
-### Start Backend
 ```bash
-cd backend && npm run dev
+# 1. Install workspace dependencies and Husky hooks
+npm install
+
+# 2. Start the data plane (postgres, postgres-shadow, redis)
+npm run docker:up
+
+# 3. Configure env files from the templates
+cp backend/.env.example backend/.env.development
+cp frontend/.env.example frontend/.env.development
+
+# 4. Apply DB migrations + seed demo data
+npm run db:migrate
+npm run db:seed
+
+# 5. Run backend and frontend in two terminals
+npm run dev:backend   # http://localhost:3001
+npm run dev:frontend  # http://localhost:5173
+
+# 6. Or run the desktop shell against the dev frontend
+npm run dev:desktop
 ```
 
-### Start Frontend
+API docs are exposed at <http://localhost:3001/api/docs> when
+`ENABLE_API_DOCS` is not set to `0`.
+
+## Building & releasing
+
 ```bash
-cd frontend && npm run dev
+npm run lint            # eslint across both workspaces
+npm run typecheck       # tsc --noEmit
+npm test                # vitest in both workspaces
+npm run build           # api (tsc) + web (vite)
+
+# Desktop installers (per-platform; defaults to host OS)
+npm run build:desktop          # current OS
+npm run build:desktop:win      # NSIS + portable, x64 + ia32
+npm run build:desktop:mac      # DMG + ZIP, x64 + arm64
+npm run build:desktop:linux    # AppImage + deb, x64
 ```
 
-### View Database
-```bash
-cd backend && npm run db:studio
-```
+CI runs everything except the desktop matrix on every push/PR.
+Pushing a `v*.*.*` tag triggers `desktop-release.yml`, which builds
+installers on Windows/macOS/Linux runners and publishes them to a
+GitHub Release.
 
-### Seed Test Data
-```bash
-cd backend && npm run db:seed
-```
+## Documentation map
 
----
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — services, data flow,
+  multi-tenant boundaries, offline sync.
+- [`docs/SECURITY.md`](docs/SECURITY.md) — threat model, secret handling,
+  reporting policy.
+- [`docs/RUNBOOK.md`](docs/RUNBOOK.md) — operational checklists, on-call
+  procedures, recovery scenarios.
+- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — branch flow, commit
+  conventions, code review.
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — production deployment
+  topology (Docker / Kubernetes), env reference.
+- [`docs/POSTGRESQL_MIGRATION.md`](docs/POSTGRESQL_MIGRATION.md) — moving
+  off the SQLite dev database.
 
-## ✅ Verification
+## License
 
-- ✅ All scripts created and tested
-- ✅ Build system working (18.58 seconds)
-- ✅ Configuration files ready
-- ✅ Documentation complete
-- ✅ No breaking changes
-- ✅ Production ready
-
----
-
-## 🚀 Next Step
-
-```powershell
-cd d:\retaj
-.\run-all.ps1
-```
-
----
-
-## 📞 Need Help?
-
-1. **Quick Setup?** → [QUICK_START.md](QUICK_START.md)
-2. **Full Details?** → [SYSTEM_COMPLETE.md](SYSTEM_COMPLETE.md)
-3. **Database Issues?** → [CREDENTIALS_AND_SETUP.md](CREDENTIALS_AND_SETUP.md)
-4. **Build Issues?** → [RUN_SYSTEM_README.md](RUN_SYSTEM_README.md)
-5. **File Index?** → [INDEX.md](INDEX.md)
-
----
-
-**Version:** 1.0.0 | **Status:** ✅ Ready | **Date:** April 24, 2026
-
-**Build System Complete & Tested!** 🎉
+Proprietary — © Retaj Store. All rights reserved.
