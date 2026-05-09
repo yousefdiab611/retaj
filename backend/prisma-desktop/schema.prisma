@@ -1,14 +1,18 @@
-// PostgreSQL schema for production deployments.
-// Use with prisma CLI: npx prisma validate --schema prisma/schema.postgresql.prisma
+// AUTO-GENERATED. Do not edit by hand.
+// Run `npm run prisma:sqlite:generate` (root) or
+// `node backend/scripts/generate-sqlite-schema.cjs` to refresh.
+// Source of truth: backend/prisma/schema.prisma
+
+// Retail Management System — PostgreSQL Commercial POS Foundation
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -95,21 +99,41 @@ model Tenant {
   maxUsers      Int               @default(3)
   maxBranches   Int               @default(1)
   maxProducts   Int               @default(100)
-  isActive      Boolean           @default(true)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  storePhone    String?
+  storeAddress  String?
+  storeLogoUrl  String?
+  receiptFooter String?
+  returnPolicy  String?
+  // Invoice & Receipt Configuration
+  invoiceLogoUrl       String?
+  invoiceThankYou      String          @default("شكراً لك على تعاملك معنا")
+  invoiceFooterNote    String?
+  loyaltyPointRate     Int             @default(1) // 1 point per X SAR
+  showQRCode           Boolean         @default(true)
+  showCustomerBalance  Boolean         @default(true)
+  invoicePrimaryColor  String          @default("#1F2937")
+  invoiceSecondaryColor String         @default("#3B82F6")
+  thermalPrintWidth    Int             @default(80) // 58 or 80mm
+  isActive             Boolean         @default(true)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
 
-  branches    Branch[]
-  users       User[]
-  customers   Customer[]
-  auditLogs      AuditLog[]
-  transactions   Transaction[]
-  licenses       License[]
-  subscriptions  Subscription[]
-  payments       Payment[]
-  devices        Device[]
-  licenseLogs    LicenseLog[]
-  supportTickets SupportTicket[]
+  branches         Branch[]
+  users            User[]
+  customers        Customer[]
+  auditLogs        AuditLog[]
+  transactions     Transaction[]
+  licenses         License[]
+  subscriptions    Subscription[]
+  payments         Payment[]
+  devices          Device[]
+  licenseLogs      LicenseLog[]
+  supportTickets   SupportTicket[]
+  backups          Backup[]
+  alerts           Alert[]
+  invoices         Invoice[]
+  loyaltyPoints    LoyaltyPoint[]
+  invoiceSettings  InvoiceSettings?
 
   @@index([name])
 }
@@ -187,7 +211,7 @@ model AuditLog {
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   ip         String?
   userAgent  String?
-  metadata   Json?
+  metadata   String?
   createdAt  DateTime @default(now())
 
   @@index([createdAt])
@@ -226,6 +250,8 @@ model Subscription {
   id                   String              @id @default(cuid())
   tenantId             String
   tenant               Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  customerId           String
+  customer             Customer            @relation(fields: [customerId], references: [id], onDelete: Restrict)
   licenseId            String?             @unique
   license              License?            @relation(fields: [licenseId], references: [id], onDelete: SetNull)
   provider             PaymentProvider     @default(STRIPE)
@@ -238,13 +264,15 @@ model Subscription {
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean             @default(false)
-  metadata             Json?
+  metadata             String?
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 
   payments Payment[]
+  invoices Invoice[]
 
   @@index([tenantId])
+  @@index([customerId])
   @@index([providerSubscriptionId])
   @@index([status])
 }
@@ -263,7 +291,7 @@ model Payment {
   description        String?         
   receiptUrl         String?         
   errorCode          String?         
-  metadata           Json?
+  metadata           String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
@@ -300,7 +328,7 @@ model LicenseLog {
   tenantId   String
   tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   action     String
-  metadata   Json?
+  metadata   String?
   createdAt  DateTime @default(now())
 
   @@index([licenseId])
@@ -332,15 +360,31 @@ model Customer {
   name         String
   email        String?
   phone        String?
-  address      String?
+  city         String?
+  ownerName    String?
+  branchesCount Int          @default(1)
+  installationDate DateTime?
+  supportPriority String     @default("NORMAL")
+  paymentBalance Decimal     @default(0)  // Current outstanding balance
+  loyaltyPoints Int          @default(0)
+  creditLimit  Decimal?                    // Max credit allowed
+  lastPaymentAt DateTime?                  // Last payment date
+  totalInvoices Int          @default(0)   // Total invoice count
   notes        String?
-  balance      Decimal       @default(0)
+  isSuspended  Boolean       @default(false)
+  isCashCustomer Boolean     @default(false) // If true, no balance/credit
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  transactions Transaction[]
-  creditLedger CustomerCreditLedger[]
+  
+  transactions   Transaction[]
+  creditLedger   CustomerCreditLedger[]
+  subscriptions  Subscription[]
+  invoices       Invoice[]
+  loyaltyPointHistory LoyaltyPoint[]
 
+  @@index([name])
   @@index([tenantId])
+  @@index([lastPaymentAt])
 }
 
 model CustomerCreditLedger {
@@ -349,6 +393,8 @@ model CustomerCreditLedger {
   customer      Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   transactionId String?
   transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  invoiceId     String?
+  invoice       Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   type          String
   amount        Decimal
   balanceAfter  Decimal
@@ -357,6 +403,7 @@ model CustomerCreditLedger {
 
   @@index([customerId])
   @@index([transactionId])
+  @@index([invoiceId])
 }
 
 model Product {
@@ -520,7 +567,174 @@ model Transaction {
   @@index([userId])
   @@index([createdAt])
   @@index([branchId])
-  @@index([warehouseId])
+  @@index([tenantId])
+}
+
+model Backup {
+  id          String    @id @default(cuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  type        String    // daily, weekly, monthly
+  filePath    String
+  fileSize    Int
+  checksum    String?
+  status      String    @default("COMPLETED") // COMPLETED, FAILED
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Alert {
+  id          String    @id @default(cuid())
+  tenantId    String?
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  type        String    // uptime, db_connection, error, backup
+  severity    String    @default("INFO") // INFO, WARNING, ERROR, CRITICAL
+  message     String
+  details     String?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+model Invoice {
+  id                 String     @id @default(cuid())
+  tenantId           String
+  tenant             Tenant     @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  customerId         String
+  customer           Customer   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  subscriptionId     String?
+  subscription       Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  
+  // Invoice Reference
+  number             String     @unique
+  reference          String?    @unique // Transaction reference if linked
+  invoiceNumber      Int?                // Sequential number for display
+  
+  // Payment & Balance Fields
+  invoiceTotal       Decimal             // Total amount of this invoice
+  paidAmount         Decimal    @default(0)  // Amount paid on this invoice
+  remainingAmount    Decimal    @default(0)  // Unpaid from this invoice
+  previousBalance    Decimal    @default(0)  // Customer's balance before this invoice
+  totalOutstanding   Decimal    @default(0)  // previousBalance + remainingAmount
+  
+  // Original amounts (for reference)
+  subtotal           Decimal
+  tax                Decimal    @default(0)
+  discount           Decimal    @default(0)
+  
+  // Customer Account Snapshot (at time of invoice)
+  customerName       String                  // Snapshot
+  customerPhone      String?                 // Snapshot
+  lastPaymentDate    DateTime?               // Snapshot
+  previousInvoiceCount Int      @default(0) // Snapshot
+  customerCreditLimit Decimal?               // Snapshot
+  
+  // Loyalty System
+  loyaltyPointsEarned Int       @default(0)
+  loyaltyPointsBefore Int       @default(0)  // Balance before
+  loyaltyPointsAfter  Int       @default(0)  // Balance after
+  loyaltyPointRecords LoyaltyPoint[]
+  creditLedgerEntries CustomerCreditLedger[]
+  nextRewardThreshold Int?                   // Points needed for next reward
+  
+  // Payment Info
+  paymentMethod      String?
+  currency           String     @default("SAR")
+  status             String     @default("PENDING") // PENDING, PAID, PARTIALLY_PAID, OVERDUE, VOIDED
+  dueDate            DateTime
+  paidAt             DateTime?
+  paidFullyAt        DateTime?
+  
+  // QR Code & Printing
+  qrCodeUrl          String?                 // URL to QR code data
+  qrCodeData         String?                 // QR code content
+  
+  // Documents
+  pdfPath            String?
+  thermalReceipt     String?                   // Thermal receipt template snapshot
+  
+  // Metadata
+  notes              String?
+  internalNotes      String?
+  tags               String               @default("[]")
+  isFullyPaid        Boolean    @default(false)
+  isPrinted          Boolean    @default(false)
+  printCount         Int        @default(0)
+  lastPrintedAt      DateTime?
+  
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([tenantId])
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@unique([tenantId, invoiceNumber]) // Unique within tenant
+}
+
+model LoyaltyPoint {
+  id                 String     @id @default(cuid())
+  tenantId           String
+  tenant             Tenant     @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  customerId         String
+  customer           Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoiceId          String?
+  invoice            Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  
+  points             Int
+  type               String     @default("EARNED") // EARNED, REDEEMED, ADJUSTED, EXPIRED
+  balanceBefore      Int
+  balanceAfter       Int
+  expiresAt          DateTime?
+  reason             String?
+  createdAt          DateTime   @default(now())
+
+  @@index([tenantId])
+  @@index([customerId])
+  @@index([invoiceId])
+  @@index([expiresAt])
+}
+
+model InvoiceSettings {
+  id                    String     @id @default(cuid())
+  tenantId              String     @unique
+  tenant                Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Display Settings
+  showQRCode            Boolean    @default(true)
+  showCustomerBalance   Boolean    @default(true)
+  showLoyaltyPoints     Boolean    @default(true)
+  showTaxBreakdown      Boolean    @default(true)
+  
+  // Format Settings
+  thermalPrintWidth     Int        @default(80) // 58 or 80mm
+  invoiceDateFormat     String     @default("DD/MM/YYYY") // Arabic-friendly
+  numberFormat          String     @default("#ARABIC") // #ARABIC or #0000
+  
+  // Branding
+  logoUrl               String?
+  thankYouMessage       String     @default("شكراً لك على تعاملك معنا")
+  footerNote            String?
+  primaryColor          String     @default("#1F2937")
+  secondaryColor        String     @default("#3B82F6")
+  
+  // Business Rules
+  loyaltyPointRate      Int        @default(1) // 1 point per X SAR
+  enableLoyalty         Boolean    @default(true)
+  enableQR              Boolean    @default(true)
+  qrFormat              String     @default("standard") // standard, detailed
+  
+  updatedAt             DateTime   @updatedAt
+
   @@index([tenantId])
 }
 
