@@ -30,6 +30,7 @@ import { branchesRouter } from "./routes/branches";
 import { customerRouter as customerCommercialRouter } from "./routes/customer-commercial";
 import { customerRouter } from "./routes/customer";
 import { customersRouter } from "./routes/customers";
+import { docsRouter } from "./routes/docs";
 import { healthRouter } from "./routes/health";
 import { inventoryRouter } from "./routes/inventory";
 import invoiceRouter from "./routes/invoices";
@@ -216,6 +217,10 @@ export function createApp() {
   });
 
   app.use("/api/health", healthRouter);
+
+  if (process.env.ENABLE_API_DOCS !== "0") {
+    app.use("/api/docs", docsRouter);
+  }
 
   app.get("/api/status", (_req, res) => {
     const dbStatus = getDatabaseStatus();
