@@ -49,11 +49,19 @@ jobs:
         run: node scripts/stage-desktop-backend.cjs
 
       - name: Build Windows installer
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-        run: npm run build:desktop:win
+        run: |
+          # electron-builder treats an empty WIN_CSC_LINK as "load this
+          # path as a certificate", which fails. Strip empty signing vars
+          # so the build produces a clean unsigned installer when no
+          # certificate is configured.
+          if [ -z "${WIN_CSC_LINK:-}" ]; then unset WIN_CSC_LINK; export CSC_IDENTITY_AUTO_DISCOVERY=false; fi
+          if [ -z "${WIN_CSC_KEY_PASSWORD:-}" ]; then unset WIN_CSC_KEY_PASSWORD; fi
+          npm run build:desktop:win
 
       - name: List produced artefacts
         if: always()
@@ -90,14 +98,19 @@ jobs:
         run: npx prisma generate --schema prisma/schema.prisma
       - working-directory: frontend
         run: node scripts/stage-desktop-backend.cjs
-      - env:
+      - name: Build macOS installer
+        shell: bash
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: npm run build:desktop:mac
+        run: |
+          if [ -z "${CSC_LINK:-}" ]; then unset CSC_LINK; export CSC_IDENTITY_AUTO_DISCOVERY=false; fi
+          if [ -z "${CSC_KEY_PASSWORD:-}" ]; then unset CSC_KEY_PASSWORD; fi
+          npm run build:desktop:mac
       - uses: actions/upload-artifact@v4
         with:
           name: retaj-desktop-macos
