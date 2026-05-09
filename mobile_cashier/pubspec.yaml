@@ -1,0 +1,35 @@
+name: retaj_cashier
+description: RETAJ STORE mobile cashier POS — Android & iOS (single codebase).
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  connectivity_plus: ^6.0.5
+  flutter_svg: ^2.0.10+1
+  flutter_secure_storage: ^9.2.2
+  go_router: ^14.6.2
+  http: ^1.2.2
+  intl: ^0.19.0
+  jwt_decoder: ^2.0.1
+  mobile_scanner: ^6.0.2
+  path: ^1.9.0
+  path_provider: ^2.1.4
+  provider: ^6.1.2
+  shared_preferences: ^2.3.3
+  sqflite: ^2.3.3+2
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/brand/retaj-logo.svg

@@ -1,0 +1,20 @@
+* text=auto eol=lf
+
+*.bat        text eol=crlf
+*.cmd        text eol=crlf
+*.ps1        text eol=crlf
+
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.gif        binary
+*.ico        binary
+*.svg        text
+*.pdf        binary
+*.zip        binary
+*.tgz        binary
+
+# Avoid noisy diffs
+package-lock.json  -diff
+yarn.lock          -diff
+pnpm-lock.yaml     -diff
