@@ -6,14 +6,16 @@ on:
       - "v*.*.*"
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: "Optional tag for this manual build (e.g. v1.2.0)"
+      include_mac:
+        description: "Also build the macOS installer"
         required: false
-      windows_only:
-        description: "Build only the Windows installer"
+        default: false
+        type: boolean
+      include_linux:
+        description: "Also build the Linux AppImage / .deb"
         required: false
-        default: "true"
-        type: string
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -22,31 +24,9 @@ env:
   NODE_VERSION: "20.18.0"
 
 jobs:
-  build:
-    name: Build (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            artifact: windows
-            script: build:desktop:win
-            always: true
-          - os: macos-latest
-            artifact: macos
-            script: build:desktop:mac
-            always: false
-          - os: ubuntu-latest
-            artifact: linux
-            script: build:desktop:linux
-            always: false
-    runs-on: ${{ matrix.os }}
-    # Always build Windows; build mac/linux only when explicitly requested
-    # (windows_only != "true") or when releasing via tag push.
-    if: |
-      matrix.always == true ||
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && (inputs.windows_only != 'true'))
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -68,19 +48,12 @@ jobs:
         working-directory: frontend
         run: node scripts/stage-desktop-backend.cjs
 
-      - name: Build desktop bundle
+      - name: Build Windows installer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS code signing (optional)
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Windows code signing (optional)
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-        run: npm run ${{ matrix.script }}
+        run: npm run build:desktop:win
 
       - name: List produced artefacts
         if: always()
@@ -89,15 +62,76 @@ jobs:
           echo "--- dist-electron ---"
           if [ -d dist-electron ]; then find dist-electron -maxdepth 4 -type f | sort; fi
 
-      - name: Upload artefacts
+      - name: Upload Windows artefacts
         uses: actions/upload-artifact@v4
         with:
-          name: retaj-desktop-${{ matrix.artifact }}
+          name: retaj-desktop-windows
           path: |
             dist-electron/**/*.exe
             dist-electron/**/*.msi
+            dist-electron/**/latest*.yml
+          if-no-files-found: warn
+          retention-days: 30
+
+  build-macos:
+    name: Build macOS installer
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.include_mac)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+        run: npx prisma generate --schema prisma/schema.prisma
+      - working-directory: frontend
+        run: node scripts/stage-desktop-backend.cjs
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: npm run build:desktop:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retaj-desktop-macos
+          path: |
             dist-electron/**/*.dmg
             dist-electron/**/*.zip
+            dist-electron/**/latest*.yml
+          if-no-files-found: warn
+          retention-days: 30
+
+  build-linux:
+    name: Build Linux installer
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.include_linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+        run: npx prisma generate --schema prisma/schema.prisma
+      - working-directory: frontend
+        run: node scripts/stage-desktop-backend.cjs
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:desktop:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retaj-desktop-linux
+          path: |
             dist-electron/**/*.AppImage
             dist-electron/**/*.deb
             dist-electron/**/latest*.yml
@@ -106,7 +140,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    needs: build
+    needs: [build-windows]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
