@@ -3,7 +3,7 @@
 # ──────────────────────────────────────────────────────────
 # Stage 1 — install full dependency tree (incl. devDependencies)
 # ──────────────────────────────────────────────────────────
-FROM node:20.18-alpine AS deps
+FROM node:26.1-alpine AS deps
 WORKDIR /app
 ENV NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false
 RUN apk add --no-cache libc6-compat openssl
@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 # ──────────────────────────────────────────────────────────
 # Stage 2 — generate Prisma client + compile TypeScript
 # ──────────────────────────────────────────────────────────
-FROM node:20.18-alpine AS build
+FROM node:26.1-alpine AS build
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 COPY --from=deps /app/node_modules ./node_modules
@@ -24,7 +24,7 @@ RUN npx prisma generate --schema prisma/schema.postgresql.prisma \
 # ──────────────────────────────────────────────────────────
 # Stage 3 — production image
 # ──────────────────────────────────────────────────────────
-FROM node:20.18-alpine AS runtime
+FROM node:26.1-alpine AS runtime
 ENV NODE_ENV=production \
     PORT=3001 \
     NPM_CONFIG_FUND=false \
