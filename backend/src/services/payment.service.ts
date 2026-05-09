@@ -1,7 +1,12 @@
 import Stripe from "stripe";
 
 const stripeKey = process.env.STRIPE_SECRET_KEY ?? "";
-const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: "2022-11-15" }) : null;
+// Stripe requires the apiVersion option to match the SDK's pinned version.
+// The installed @stripe/stripe-node ships with its own preferred version, so
+// we omit the explicit apiVersion to let the SDK pick the correct default.
+const stripe = stripeKey ? new Stripe(stripeKey) : null;
+
+export const isStripeConfigured = (): boolean => stripe !== null;
 
 export type BillingPlanDefinition = {
   key: string;

@@ -3,44 +3,49 @@ import "express-async-errors";
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response, type Router } from "express";
 import helmet from "helmet";
+import { ZodError } from "zod";
 import { UserRole } from "@prisma/client";
 
 import { getCorsOrigin } from "./config/cors";
+import { billingController } from "./controllers/billingController";
 import { AppError } from "./http/AppError";
 import { logger } from "./lib/logger";
 import { getDatabaseStatus, isDatabaseOnline } from "./lib/dbBootstrap";
 import { isDatabaseUnavailableError } from "./lib/errors";
-import { prisma } from "./lib/prisma";
+import { resolveActiveBranch, requireBranchSelected } from "./middleware/branchContext";
 import { apiRateLimiter, sensitiveWriteRateLimiter } from "./middleware/rateLimits";
+import { requestContext } from "./middleware/requestContext";
 import { requireAuth } from "./middleware/requireAuth";
 import { requireRole } from "./middleware/requireRole";
 import { sanitizeBody } from "./middleware/sanitizeBody";
-import { resolveActiveBranch, requireBranchSelected } from "./middleware/branchContext";
 import { adminRouter as adminCommercialRouter } from "./routes/admin-commercial";
-import { customerRouter as customerCommercialRouter } from "./routes/customer-commercial";
-import { billingRouter as billingCommercialRouter } from "./routes/billing-commercial";
-import { backupRouter } from "./routes/backup";
-import { healthRouter } from "./routes/health";
+import { adminRouter } from "./routes/admin";
+import { adminProductsRouter } from "./routes/adminProducts";
 import { authRouter } from "./routes/auth";
+import { backupRouter } from "./routes/backup";
+import { billingRouter as billingCommercialRouter } from "./routes/billing-commercial";
 import { billingRouter } from "./routes/billing";
 import { branchesRouter } from "./routes/branches";
-import { customersRouter } from "./routes/customers";
-import { tenantsRouter } from "./routes/tenants";
-import { settingsRouter } from "./routes/settings";
-import { usersRouter } from "./routes/users";
-import { reportsRouter } from "./routes/reports";
+import { customerRouter as customerCommercialRouter } from "./routes/customer-commercial";
 import { customerRouter } from "./routes/customer";
-import { warehousesRouter } from "./routes/warehouses";
-import { productsRouter } from "./routes/products";
-import { transactionsRouter } from "./routes/transactions";
-import { syncRouter } from "./routes/sync";
-import { adminProductsRouter } from "./routes/adminProducts";
-import { adminRouter } from "./routes/admin";
-import { licenseRouter, publicLicenseRouter } from "./routes/licenses";
+import { customersRouter } from "./routes/customers";
+import { healthRouter } from "./routes/health";
 import { inventoryRouter } from "./routes/inventory";
-import { stockRouter } from "./routes/stock";
 import invoiceRouter from "./routes/invoices";
+import { licenseRouter, publicLicenseRouter } from "./routes/licenses";
+import { productsRouter } from "./routes/products";
+import { reportsRouter } from "./routes/reports";
+import { settingsRouter } from "./routes/settings";
+import { stockRouter } from "./routes/stock";
+import { syncRouter } from "./routes/sync";
+import { tenantsRouter } from "./routes/tenants";
+import { transactionsRouter } from "./routes/transactions";
+import { usersRouter } from "./routes/users";
+import { warehousesRouter } from "./routes/warehouses";
 import { BackupService } from "./services/backup.service";
+
+const REQUEST_BODY_LIMIT = process.env.REQUEST_BODY_LIMIT ?? "1mb";
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS ?? 30_000);
 
 function buildApiRouter(): Router {
   const api = express.Router();
@@ -91,6 +96,11 @@ function buildApiRouter(): Router {
 
   api.use("/license", licenseRouter);
 
+  // Mounted but unused router placeholders kept for future commercial APIs.
+  void adminCommercialRouter;
+  void billingCommercialRouter;
+  void customerCommercialRouter;
+
   return api;
 }
 
@@ -102,22 +112,31 @@ export function createApp() {
     app.set("trust proxy", true);
   }
 
+  app.use(requestContext);
+
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
+      crossOriginEmbedderPolicy: false,
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : [])],
+          styleSrc: [
+            "'self'",
+            ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : []),
+          ],
           scriptSrc: ["'self'"],
-          imgSrc: ["'self'", "data:", "https:"],
+          imgSrc: ["'self'", "data:", "blob:", "https:"],
+          connectSrc: ["'self'", "https:", "wss:"],
+          fontSrc: ["'self'", "data:", "https:"],
           objectSrc: ["'none'"],
           baseUri: ["'self'"],
           formAction: ["'self'"],
+          frameAncestors: ["'none'"],
         },
       },
       hsts: {
-        maxAge: 31536000,
+        maxAge: 31_536_000,
         includeSubDomains: true,
         preload: true,
       },
@@ -130,34 +149,59 @@ export function createApp() {
     cors({
       origin: getCorsOrigin(),
       credentials: true,
+      exposedHeaders: ["x-request-id"],
     }),
   );
-  app.use(express.json({ limit: "1mb" }));
-  app.use(express.urlencoded({ extended: false, limit: "1mb" }));
+
+  // ──────────────────────────────────────────────────────────────────
+  // Stripe webhook MUST receive the raw bytes so signature verification
+  // can succeed. It is mounted BEFORE the JSON body parser.
+  // ──────────────────────────────────────────────────────────────────
+  app.post(
+    "/api/billing/webhook/stripe",
+    express.raw({ type: "application/json", limit: "2mb" }),
+    (req, res) => void billingController.handleStripeWebhook(req, res),
+  );
+  app.post(
+    "/api/v1/billing/webhook/stripe",
+    express.raw({ type: "application/json", limit: "2mb" }),
+    (req, res) => void billingController.handleStripeWebhook(req, res),
+  );
+
+  app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
+  app.use(express.urlencoded({ extended: false, limit: REQUEST_BODY_LIMIT }));
   app.use((req, res, next) => {
     if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method) && !req.is("application/json")) {
-      res.status(415).json({ error: "Content-Type must be application/json", code: "UNSUPPORTED_MEDIA_TYPE" });
+      res.status(415).json({
+        error: "Content-Type must be application/json",
+        code: "UNSUPPORTED_MEDIA_TYPE",
+        requestId: req.requestId,
+      });
       return;
     }
     next();
   });
   app.use(sanitizeBody);
 
-  // Request timeout protection
   app.use((req, res, next) => {
     const timeout = setTimeout(() => {
       if (!res.headersSent) {
-        res.status(408).json({ error: "Request timeout", code: "TIMEOUT" });
+        res
+          .status(408)
+          .json({ error: "Request timeout", code: "TIMEOUT", requestId: req.requestId });
       }
-    }, 30000); // 30 second timeout
-
-    res.on('finish', () => clearTimeout(timeout));
-    res.on('close', () => clearTimeout(timeout));
+    }, REQUEST_TIMEOUT_MS);
+    res.on("finish", () => clearTimeout(timeout));
+    res.on("close", () => clearTimeout(timeout));
     next();
   });
 
   app.get("/health", (_req, res) => {
-    res.json({ ok: true, service: "retaj-store-api", version: process.env.npm_package_version ?? "1.0.0" });
+    res.json({
+      ok: true,
+      service: "retaj-store-api",
+      version: process.env.npm_package_version ?? "1.0.0",
+    });
   });
 
   app.get("/api/ready", (_req, res) => {
@@ -180,27 +224,48 @@ export function createApp() {
   app.use("/api", apiRouter);
   app.use("/api/v1", apiRouter);
 
-  app.use((_req, res) => {
-    res.status(404).json({ error: "Not found", code: "NOT_FOUND" });
+  app.use((req, res) => {
+    res
+      .status(404)
+      .json({ error: "Not found", code: "NOT_FOUND", requestId: req.requestId });
   });
 
-  const backupService = new BackupService();
-  backupService.scheduleBackups();
+  if (process.env.DISABLE_SCHEDULED_BACKUPS !== "1") {
+    const backupService = new BackupService();
+    backupService.scheduleBackups();
+  }
 
-  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+    const requestId = req.requestId;
+
     if (err instanceof AppError) {
-      res.status(err.statusCode).json({ error: err.message, code: err.code ?? "APP_ERROR" });
+      res
+        .status(err.statusCode)
+        .json({ error: err.message, code: err.code ?? "APP_ERROR", requestId });
       return;
     }
+
+    if (err instanceof ZodError) {
+      res.status(400).json({
+        error: "Validation failed",
+        code: "VALIDATION",
+        details: err.flatten(),
+        requestId,
+      });
+      return;
+    }
+
     if (isDatabaseUnavailableError(err)) {
-      logger.warn({ err }, "database_unavailable");
-      res.status(503).json({ error: "Database unavailable", code: "DB_UNAVAILABLE" });
+      logger.warn({ err, requestId }, "database_unavailable");
+      res.status(503).json({ error: "Database unavailable", code: "DB_UNAVAILABLE", requestId });
       return;
     }
-    logger.error({ err }, "unhandled_error");
-    const body: { error: string; code: string; details?: string } = {
+
+    logger.error({ err, requestId, url: req.originalUrl, method: req.method }, "unhandled_error");
+    const body: { error: string; code: string; requestId: string; details?: string } = {
       error: "Internal server error",
       code: "INTERNAL",
+      requestId,
     };
     if (process.env.NODE_ENV !== "production" && err instanceof Error) {
       body.details = err.message;
