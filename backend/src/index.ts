@@ -7,6 +7,7 @@ import { initDatabaseBootstrap, getDatabaseStatus } from "./lib/dbBootstrap";
 import { logger } from "./lib/logger";
 import { initObservability } from "./lib/observability";
 import { rawPrisma } from "./lib/prisma";
+import { closeRedis } from "./lib/redis";
 
 const envFile = process.env.NODE_ENV === "production" ? ".env.production" : ".env.development";
 const envResult = dotenv.config({ path: envFile });
@@ -58,6 +59,11 @@ async function main(): Promise<void> {
         await rawPrisma.$disconnect();
       } catch (disconnectErr) {
         logger.error({ err: disconnectErr }, "shutdown_prisma_disconnect_error");
+      }
+      try {
+        await closeRedis();
+      } catch (redisErr) {
+        logger.error({ err: redisErr }, "shutdown_redis_close_error");
       }
       logger.info({ signal }, "shutdown_complete");
       process.exit(err ? 1 : 0);
