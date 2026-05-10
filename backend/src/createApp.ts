@@ -38,6 +38,7 @@ import { licenseRouter, publicLicenseRouter } from "./routes/licenses";
 import { productsRouter } from "./routes/products";
 import { reportsRouter } from "./routes/reports";
 import { settingsRouter } from "./routes/settings";
+import { setupRouter } from "./routes/setup";
 import { stockRouter } from "./routes/stock";
 import { syncRouter } from "./routes/sync";
 import { tenantsRouter } from "./routes/tenants";
@@ -54,6 +55,9 @@ function buildApiRouter(): Router {
 
   api.use("/auth", authRouter);
   api.use("/licenses", publicLicenseRouter);
+  // First-run provisioning: must be reachable before auth on a fresh DB.
+  // The handlers themselves self-lock once any user exists.
+  api.use("/setup", setupRouter);
   api.use(apiRateLimiter);
   api.use("/billing", billingRouter);
   api.use(requireAuth);

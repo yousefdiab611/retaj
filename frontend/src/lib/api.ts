@@ -1,8 +1,3 @@
-import type { AdminDashboardStats, AuditLogRow, CustomerRow, LicenseRow } from "@/types/billing";
-import type { InvoiceTransaction } from "@/types/invoice";
-import type { Product } from "@/types/product";
-import type { AuthUser, BranchBrief } from "@/types/user";
-
 import { isDesktopApp } from "@/lib/electron";
 import { searchOfflineCustomers } from "@/lib/offline/customersDb";
 import {
@@ -11,6 +6,11 @@ import {
   saveCachedProducts,
   setProductCacheTimestamp,
 } from "@/lib/offline/productsDb";
+
+import type { AdminDashboardStats, AuditLogRow, CustomerRow, LicenseRow } from "@/types/billing";
+import type { InvoiceTransaction } from "@/types/invoice";
+import type { Product } from "@/types/product";
+import type { AuthUser, BranchBrief } from "@/types/user";
 
 const TOKEN_KEY = "retaj-store_access_token";
 const REFRESH_KEY = "retaj-store_refresh_token";
@@ -24,7 +24,8 @@ function getApiBaseUrl(): string {
     // The Electron preload script forwards the chosen backend port via
     // a global so the renderer doesn't have to guess (and so we don't
     // collide with whatever the user already has on :3001).
-    const desktopBoot = (window as unknown as { __RETAJ_BOOT__?: { apiBaseUrl?: string | null } }).__RETAJ_BOOT__;
+    const desktopBoot = (window as unknown as { __RETAJ_BOOT__?: { apiBaseUrl?: string | null } })
+      .__RETAJ_BOOT__;
     if (desktopBoot?.apiBaseUrl) {
       return desktopBoot.apiBaseUrl.replace(/\/$/, "");
     }
@@ -907,4 +908,35 @@ export async function updateTenantApi(
   if (!res.ok) throw new Error(await readError(res));
   const data = (await res.json()) as { tenant: TenantDto };
   return data.tenant;
+}
+
+// ---------------------------------------------------------------------------
+// First-run setup (desktop standalone bootstrap)
+// ---------------------------------------------------------------------------
+
+export type SetupStatus = { needsSetup: boolean };
+export type InitialSetupPayload = {
+  businessName: string;
+  branchName: string;
+  adminName: string;
+  adminUsername: string;
+  adminPassword: string;
+  adminEmail?: string;
+  storePhone?: string;
+  storeAddress?: string;
+};
+
+export async function fetchSetupStatus(): Promise<SetupStatus> {
+  const res = await fetch(apiUrl("/api/setup/status"), { method: "GET" });
+  if (!res.ok) throw new Error(await readError(res));
+  return (await res.json()) as SetupStatus;
+}
+
+export async function runInitialSetup(payload: InitialSetupPayload): Promise<void> {
+  const res = await fetch(apiUrl("/api/setup/initial"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await readError(res));
 }
