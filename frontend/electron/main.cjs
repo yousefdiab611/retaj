@@ -184,6 +184,20 @@ function getDesktopDatabaseUrl() {
   return `file:${dbFile.replace(/\\/g, "/")}`;
 }
 
+function getBackendLogFilePath() {
+  // Pino MUST write somewhere user-writable. The packaged backend's cwd
+  // sits under Program Files (read-only on Windows), so we explicitly
+  // redirect the API log into the per-user data directory next to the DB.
+  const dir = path.join(app.getPath("userData"), "logs");
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch {
+    // best effort; the backend will fall back to stdout if the file is
+    // not openable.
+  }
+  return path.join(dir, "retaj-api.log");
+}
+
 async function buildBackendEnv() {
   const jwtSecret = await getOrCreateJwtSecret();
   const env = {
@@ -196,6 +210,7 @@ async function buildBackendEnv() {
     JWT_SECRET: jwtSecret,
     LOG_LEVEL: "info",
     LOG_PRETTY: "0",
+    LOG_FILE_PATH: getBackendLogFilePath(),
     DISABLE_SCHEDULED_BACKUPS: "1",
     DB_DOCKER_RECOVERY: "0",
     ALLOWED_ORIGINS: "*",
