@@ -1,7 +1,7 @@
 {
   "name": "retaj-store-frontend",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -31,8 +31,11 @@
     "@sentry/react": "^8.50.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "electron-store": "^9.0.0",
+    "electron-updater": "^6.8.3",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.487.0",
+    "node-machine-id": "^1.1.12",
     "qrcode-generator": "^1.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -53,10 +56,7 @@
     "concurrently": "^8.2.2",
     "electron": "^28.2.0",
     "electron-builder": "^24.13.3",
-    "electron-store": "^9.0.0",
-    "electron-updater": "^6.8.3",
     "jsdom": "^25.0.1",
-    "node-machine-id": "^1.1.12",
     "png-to-ico": "^3.0.1",
     "postcss": "^8.4.49",
     "sharp": "^0.34.5",
@@ -78,14 +78,16 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "public/retaj-icon.ico"
+      "public/retaj-icon.ico",
+      "public/retaj-icon.png",
+      "package.json",
+      "node_modules/**/*",
+      "!node_modules/{electron,electron-builder,@vitejs/**,@vitest/**,@testing-library/**,vite,vitest,jsdom,sharp,png-to-ico,typescript,tailwindcss,autoprefixer,postcss,concurrently,wait-on}/**/*",
+      "!node_modules/.cache/**/*",
+      "!node_modules/**/{*.md,*.markdown,LICENSE*,license*,README*,readme*,CHANGELOG*,changelog*,HISTORY*,history*,*.test.js,*.spec.js,test/**/*,tests/**/*,__tests__/**/*,docs/**/*,doc/**/*,examples/**/*,example/**/*}",
+      "!node_modules/**/{.eslintrc*,.prettierrc*,.editorconfig,.babelrc*,.npmignore,.gitignore,.travis.yml,.github/**/*,*.ts,!*.d.ts,tsconfig*.json,rollup.config*,webpack.config*,gulpfile*}"
     ],
     "asar": true,
-    "asarUnpack": [
-      "**/node_modules/@prisma/**",
-      "**/node_modules/.prisma/**",
-      "**/node_modules/prisma/**"
-    ],
     "extraResources": [
       {
         "from": "../dist-electron-staging/backend",
