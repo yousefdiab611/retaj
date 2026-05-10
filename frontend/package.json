@@ -34,7 +34,7 @@
     "electron-store": "^9.0.0",
     "electron-updater": "^6.8.3",
     "html5-qrcode": "^2.3.8",
-    "lucide-react": "^0.487.0",
+    "lucide-react": "^1.14.0",
     "node-machine-id": "^1.1.12",
     "qrcode-generator": "^1.4.4",
     "react": "^18.3.1",
