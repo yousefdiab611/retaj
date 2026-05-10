@@ -423,6 +423,34 @@ function createWindow() {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 
+  // Always allow opening DevTools manually so packaged-app issues stay
+  // diagnosable (F12 / Ctrl+Shift+I / Cmd+Alt+I).
+  mainWindow.webContents.on("before-input-event", (_event, input) => {
+    if (input.type !== "keyDown") return;
+    const key = (input.key || "").toLowerCase();
+    const togglesDevTools =
+      key === "f12" ||
+      ((input.control || input.meta) && input.shift && key === "i") ||
+      (input.meta && input.alt && key === "i");
+    if (togglesDevTools) {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
+
+  // If the renderer crashes or fails to load any asset, surface a hint
+  // instead of leaving the window blank.
+  mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedURL) => {
+    diag("error", "renderer did-fail-load", { errorCode, errorDescription, validatedURL });
+  });
+  mainWindow.webContents.on("render-process-gone", (_event, details) => {
+    diag("error", "renderer process gone", details);
+  });
+  mainWindow.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+    if (level >= 2) {
+      diag("warn", `[renderer console] ${message}`, { line, sourceId });
+    }
+  });
+
   mainWindow.once("ready-to-show", () => mainWindow.show());
 
   mainWindow.on("closed", () => {

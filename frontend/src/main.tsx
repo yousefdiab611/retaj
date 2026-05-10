@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import App from "./App.tsx";
+import { RootErrorBoundary } from "./components/RootErrorBoundary";
 import { preloadBrandLogo } from "./lib/branding";
 import { initSentry } from "./lib/sentry";
 import "./index.css";
@@ -20,6 +21,8 @@ applyInitialTheme();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <RootErrorBoundary>
+      <App />
+    </RootErrorBoundary>
   </StrictMode>,
 );

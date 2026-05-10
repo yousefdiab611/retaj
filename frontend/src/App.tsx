@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AdminRoute } from "@/components/AdminRoute";
 import { ManagerRoute } from "@/components/ManagerRoute";
@@ -20,7 +20,7 @@ import { TenantsPage } from "@/pages/TenantsPage";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <OfflineSyncDaemon />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -121,6 +121,6 @@ export default function App() {
         />
         <Route path="/" element={<Navigate to="/pos" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
