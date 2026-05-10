@@ -5,6 +5,7 @@ import {
   createStripeCheckoutSession,
   verifyStripeWebhookSignature,
   getBillingPlan,
+  isStripeConfigured,
 } from "../services/payment.service";
 import {
   getBillingPlans,
@@ -26,6 +27,13 @@ export const billingController = {
   },
 
   async createCheckoutSession(req: Request, res: Response) {
+    if (!isStripeConfigured()) {
+      res.status(503).json({
+        error: "Online payments are disabled in this build",
+        code: "PAYMENTS_DISABLED",
+      });
+      return;
+    }
     const tenantId = req.userTenantId;
     if (!tenantId) {
       res.status(400).json({ error: "Tenant required", code: "TENANT_REQUIRED" });
@@ -102,6 +110,13 @@ export const billingController = {
   },
 
   async handleStripeWebhook(req: Request, res: Response) {
+    if (!isStripeConfigured()) {
+      res.status(503).json({
+        error: "Online payments are disabled in this build",
+        code: "PAYMENTS_DISABLED",
+      });
+      return;
+    }
     const signature = String(req.headers["stripe-signature"] ?? "");
     const rawBody = req.body instanceof Buffer ? req.body : Buffer.from(String(req.body ?? ""), "utf8");
     if (!rawBody || !signature) {

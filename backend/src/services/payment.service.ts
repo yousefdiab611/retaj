@@ -1,12 +1,44 @@
-import Stripe from "stripe";
+// Stripe is loaded lazily so the standalone desktop bundle (which
+// deliberately omits the `stripe` npm package to keep the installer
+// slim) can still start. Type-only import is erased at compile time
+// and never produces a runtime require, so it stays safe even when
+// the runtime module is absent.
+import type Stripe from "stripe";
 
-const stripeKey = process.env.STRIPE_SECRET_KEY ?? "";
-// Pin to a recent stable API version so contract changes are explicit.
-// Override via STRIPE_API_VERSION when migrating to a newer release.
-const STRIPE_API_VERSION = (process.env.STRIPE_API_VERSION ?? "2024-06-20") as Stripe.LatestApiVersion;
-const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: STRIPE_API_VERSION }) : null;
+type StripeCtor = typeof import("stripe").default;
 
-export const isStripeConfigured = (): boolean => stripe !== null;
+let stripeModuleLoaded = false;
+let stripeCtor: StripeCtor | null = null;
+let stripeInstance: Stripe | null = null;
+
+function loadStripeModule(): StripeCtor | null {
+  if (stripeModuleLoaded) return stripeCtor;
+  stripeModuleLoaded = true;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require("stripe");
+    stripeCtor = (mod?.default ?? mod) as StripeCtor;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code !== "MODULE_NOT_FOUND") throw err;
+    stripeCtor = null;
+  }
+  return stripeCtor;
+}
+
+function getStripeClient(): Stripe | null {
+  if (stripeInstance) return stripeInstance;
+  const stripeKey = process.env.STRIPE_SECRET_KEY ?? "";
+  if (!stripeKey) return null;
+  const Ctor = loadStripeModule();
+  if (!Ctor) return null;
+  // Pin to a recent stable API version so contract changes are explicit.
+  // Override via STRIPE_API_VERSION when migrating to a newer release.
+  const apiVersion = (process.env.STRIPE_API_VERSION ?? "2024-06-20") as Stripe.LatestApiVersion;
+  stripeInstance = new Ctor(stripeKey, { apiVersion });
+  return stripeInstance;
+}
+
+export const isStripeConfigured = (): boolean => getStripeClient() !== null;
 
 export type BillingPlanDefinition = {
   key: string;
@@ -65,6 +97,7 @@ export async function createStripeCheckoutSession(options: {
   cancelUrl: string;
   customerEmail?: string;
 }) {
+  const stripe = getStripeClient();
   if (!stripe) {
     throw new Error("Stripe is not configured. Set STRIPE_SECRET_KEY.");
   }
@@ -103,6 +136,7 @@ export async function createStripeCheckoutSession(options: {
 }
 
 export function verifyStripeWebhookSignature(payload: Buffer, signature: string) {
+  const stripe = getStripeClient();
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!stripe || !secret) {
     throw new Error("Stripe webhook is not configured");
