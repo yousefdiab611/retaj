@@ -65,6 +65,9 @@ export async function initDatabaseBootstrap(): Promise<void> {
   if (url.startsWith("postgresql://") || url.startsWith("postgres://")) {
     status.provider = "postgresql";
     await initializePostgres();
+  } else if (url.startsWith("file:")) {
+    status.provider = "sqlite";
+    await initializeSqlite();
   } else {
     logger.warn({ url }, "Unsupported DATABASE_URL provider; starting offline fallback mode");
     status.provider = "none";
@@ -76,6 +79,32 @@ export async function initDatabaseBootstrap(): Promise<void> {
 
   bootstrapCompleted = true;
   startRecoveryWatcher();
+}
+
+async function initializeSqlite(): Promise<void> {
+  // Standalone desktop topology: the Electron shell has already run
+  // `prisma migrate deploy --schema=prisma-desktop/schema.prisma`
+  // before forking us, so all we need to do here is verify the
+  // connection works. No docker recovery, no shadow database, no
+  // background reconnect loop.
+  try {
+    logger.info("attempting SQLite connection");
+    await rawPrisma.$connect();
+    await rawPrisma.$queryRaw`SELECT 1`;
+
+    status.online = true;
+    status.prismaStatus = "READY";
+    status.syncEngineStatus = "ACTIVE";
+    status.lastError = undefined;
+
+    logger.info("SQLite connection established");
+  } catch (error) {
+    status.online = false;
+    status.prismaStatus = "FALLBACK";
+    status.syncEngineStatus = "QUEUED";
+    status.lastError = error instanceof Error ? error.message : String(error);
+    logger.warn({ err: error }, "SQLite unavailable; offline fallback mode");
+  }
 }
 
 async function initializePostgres(): Promise<void> {
@@ -159,6 +188,11 @@ async function attemptDockerRecovery(): Promise<void> {
 
 function startRecoveryWatcher(): void {
   if (recoveryTimer) return;
+
+  // Embedded SQLite has no separate database server to "recover", and
+  // we definitely never want to run docker / prisma bootstrap from
+  // inside the desktop process - that machinery is Postgres-only.
+  if (status.provider === "sqlite") return;
 
   recoveryTimer = setInterval(async () => {
     if (status.online) return;

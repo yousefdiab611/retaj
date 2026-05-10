@@ -3,7 +3,7 @@
  * Retaj Store - Electron main process
  *
  * Standalone Windows desktop topology:
- *   - SQLite database file lives under app.getPath('userData')/retaj.db
+ *   - SQLite database file lives under app.getPath('userData')/data/retaj.db
  *   - JWT_SECRET is generated once and persisted in an encrypted store
  *     (keyed by the machine fingerprint so credentials don't survive
  *     being copied to a different physical PC)
@@ -22,15 +22,54 @@ const { machineIdSync } = require("node-machine-id");
 const { createHash, randomBytes } = require("crypto");
 
 const BACKEND_PORT = Number(process.env.RETAJ_BACKEND_PORT) || 38217;
-const BACKEND_READY_TIMEOUT_MS = 30_000;
+const BACKEND_READY_TIMEOUT_MS = Number(process.env.RETAJ_BACKEND_TIMEOUT_MS) || 90_000;
 const BACKEND_HEALTH_PATH = "/health";
 
 let mainWindow = null;
 let backendProcess = null;
 let backendReady = false;
+let backendLastError = null;
+let logStream = null;
+let logFilePath = null;
 let Store = null;
 let licenseStore = null;
 let secretStore = null;
+
+// ---------------------------------------------------------------------------
+// Diagnostic logging (file + console)
+// ---------------------------------------------------------------------------
+
+function ensureLogStream() {
+  if (logStream) return;
+  try {
+    const logsDir = path.join(app.getPath("userData"), "logs");
+    fs.mkdirSync(logsDir, { recursive: true });
+    logFilePath = path.join(logsDir, "electron-main.log");
+    logStream = fs.createWriteStream(logFilePath, { flags: "a" });
+    logStream.write(`\n\n===== launch ${new Date().toISOString()} =====\n`);
+    logStream.write(`app version : ${app.getVersion()}\n`);
+    logStream.write(`process.execPath: ${process.execPath}\n`);
+    logStream.write(`process.resourcesPath: ${process.resourcesPath}\n`);
+    logStream.write(`app.isPackaged: ${app.isPackaged}\n`);
+    logStream.write(`platform: ${process.platform} ${process.arch}\n`);
+    logStream.write(`node: ${process.versions.node} electron: ${process.versions.electron}\n`);
+  } catch (err) {
+    console.error("could not open log stream", err);
+  }
+}
+
+function diag(level, message, extra) {
+  ensureLogStream();
+  const line = `[${new Date().toISOString()}] [${level}] ${message}${
+    extra ? " " + (typeof extra === "string" ? extra : JSON.stringify(extra)) : ""
+  }`;
+  if (logStream) logStream.write(line + "\n");
+  if (level === "error" || level === "warn") {
+    console.error(line);
+  } else {
+    console.log(line);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Encrypted local stores (license + machine-bound secrets)
@@ -45,7 +84,8 @@ async function importElectronStore() {
 }
 
 function getStorageEncryptionKey(seedSalt) {
-  const seed = process.env.LICENSE_STORAGE_KEY || `${machineIdSync({ original: true })}:${app.getName()}:${seedSalt}`;
+  const seed =
+    process.env.LICENSE_STORAGE_KEY || `${machineIdSync({ original: true })}:${app.getName()}:${seedSalt}`;
   return createHash("sha256").update(seed, "utf8").digest("hex");
 }
 
@@ -117,6 +157,7 @@ function resolveBackendPaths() {
       entry: path.join(resourcesBackend, "dist", "index.js"),
       prismaSchema: path.join(resourcesBackend, "prisma-desktop", "schema.prisma"),
       prismaCli: path.join(resourcesBackend, "node_modules", "prisma", "build", "index.js"),
+      nodeModules: path.join(resourcesBackend, "node_modules"),
     };
   }
   const devBackend = path.resolve(__dirname, "..", "..", "backend");
@@ -125,6 +166,7 @@ function resolveBackendPaths() {
     entry: path.join(devBackend, "dist", "index.js"),
     prismaSchema: path.join(devBackend, "prisma-desktop", "schema.prisma"),
     prismaCli: path.join(devBackend, "node_modules", "prisma", "build", "index.js"),
+    nodeModules: path.join(devBackend, "node_modules"),
   };
 }
 
@@ -136,13 +178,15 @@ function getDesktopDataDir() {
 
 function getDesktopDatabaseUrl() {
   const dbFile = path.join(getDesktopDataDir(), "retaj.db");
-  // Prisma's SQLite URL needs file:/// triple slash on absolute paths.
-  return `file:${dbFile}`;
+  // Prisma's SQLite URL accepts forward slashes everywhere; backslashes
+  // would otherwise need shell escaping when the user data path lives on
+  // a drive letter with spaces (e.g. "C:\Users\Joe\AppData\Roaming\Retaj Store").
+  return `file:${dbFile.replace(/\\/g, "/")}`;
 }
 
 async function buildBackendEnv() {
   const jwtSecret = await getOrCreateJwtSecret();
-  return {
+  const env = {
     ...process.env,
     NODE_ENV: "production",
     PORT: String(BACKEND_PORT),
@@ -156,102 +200,152 @@ async function buildBackendEnv() {
     DB_DOCKER_RECOVERY: "0",
     ALLOWED_ORIGINS: "*",
     TRUST_PROXY: "0",
-    // No Redis / Stripe in standalone desktop mode.
     REDIS_URL: "",
     STRIPE_SECRET_KEY: "",
   };
+  // Make sure node never tries to look up modules outside our bundled tree.
+  delete env.NODE_OPTIONS;
+  return env;
 }
 
 function runPrismaDeploy(env, paths) {
   if (!fs.existsSync(paths.prismaCli)) {
-    console.warn("[bootstrap] prisma CLI not found at", paths.prismaCli);
-    return;
+    diag("warn", "prisma CLI not found, skipping migrate deploy", { prismaCli: paths.prismaCli });
+    return true;
   }
   if (!fs.existsSync(paths.prismaSchema)) {
-    console.warn("[bootstrap] prisma desktop schema not found at", paths.prismaSchema);
-    return;
+    diag("warn", "prisma desktop schema not found, skipping migrate deploy", {
+      prismaSchema: paths.prismaSchema,
+    });
+    return true;
   }
-  console.log("[bootstrap] running prisma migrate deploy");
-  const result = spawnSync(process.execPath, [paths.prismaCli, "migrate", "deploy", `--schema=${paths.prismaSchema}`], {
-    cwd: paths.cwd,
-    env: {
-      ...env,
-      ELECTRON_RUN_AS_NODE: "1",
+  diag("info", "running prisma migrate deploy", { schema: paths.prismaSchema });
+  const result = spawnSync(
+    process.execPath,
+    [paths.prismaCli, "migrate", "deploy", `--schema=${paths.prismaSchema}`],
+    {
+      cwd: paths.cwd,
+      env: {
+        ...env,
+        ELECTRON_RUN_AS_NODE: "1",
+      },
+      encoding: "utf8",
     },
-    encoding: "utf8",
-  });
+  );
+  if (result.stdout) diag("info", "[prisma stdout]", result.stdout.trim());
+  if (result.stderr) diag("warn", "[prisma stderr]", result.stderr.trim());
   if (result.status !== 0) {
-    console.error("[bootstrap] migrate deploy failed", result.stdout, result.stderr);
-    dialog.showErrorBox(
-      "Database setup failed",
-      "Could not initialise the local database. The application will close.\n\n" +
-        (result.stderr || result.stdout || "Unknown error"),
-    );
-    app.exit(1);
-    return;
+    diag("error", "prisma migrate deploy failed", { status: result.status });
+    return false;
   }
-  console.log(result.stdout?.trim());
+  diag("info", "prisma migrate deploy completed");
+  return true;
 }
 
 async function waitForBackendHealth(timeoutMs) {
   const deadline = Date.now() + timeoutMs;
-  // eslint-disable-next-line no-undef
   const fetcher = typeof fetch === "function" ? fetch : null;
+  let lastStatus = null;
   while (Date.now() < deadline) {
+    if (!backendProcess) {
+      diag("error", "backend process exited before becoming healthy");
+      return false;
+    }
     try {
       if (fetcher) {
         const resp = await fetcher(`http://127.0.0.1:${BACKEND_PORT}${BACKEND_HEALTH_PATH}`);
+        lastStatus = resp.status;
         if (resp.ok) {
           backendReady = true;
+          diag("info", "backend is healthy", { status: resp.status, port: BACKEND_PORT });
           return true;
         }
       }
-    } catch {
-      // backend not up yet
+    } catch (err) {
+      backendLastError = err?.message ?? String(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
+  diag("error", "backend health probe timed out", {
+    timeoutMs,
+    lastStatus,
+    lastError: backendLastError,
+  });
   return false;
 }
 
 async function startBackend() {
   if (isDev) {
-    console.log("[backend] dev mode, expecting external backend on :3001");
+    diag("info", "dev mode, expecting external backend on :3001");
     backendReady = true;
     return;
   }
   const paths = resolveBackendPaths();
+  diag("info", "backend paths resolved", paths);
+
+  for (const [key, p] of Object.entries(paths)) {
+    if (key === "cwd" || key === "nodeModules") continue;
+    if (!fs.existsSync(p)) {
+      diag("error", `required file missing: ${key}`, { path: p });
+    }
+  }
+
   if (!fs.existsSync(paths.entry)) {
-    dialog.showErrorBox("Missing backend", `Backend bundle not found at ${paths.entry}`);
-    app.exit(1);
+    showFatalDialog(
+      "Backend entry missing",
+      `The backend bundle was not packaged correctly.\n\nExpected at:\n${paths.entry}`,
+    );
     return;
   }
-  const env = await buildBackendEnv();
-  runPrismaDeploy(env, paths);
 
-  console.log(`[backend] launching ${paths.entry}`);
+  const env = await buildBackendEnv();
+  diag("info", "backend env prepared", {
+    DATABASE_URL: env.DATABASE_URL,
+    PORT: env.PORT,
+    DATABASE_PROVIDER: env.DATABASE_PROVIDER,
+  });
+
+  const migrateOk = runPrismaDeploy(env, paths);
+  if (!migrateOk) {
+    showFatalDialog(
+      "Database setup failed",
+      `Prisma could not initialise the local database.\n\nSee log:\n${logFilePath}`,
+    );
+    return;
+  }
+
+  diag("info", `spawning backend ${paths.entry}`);
   backendProcess = spawn(process.execPath, [paths.entry], {
     cwd: paths.cwd,
     env: { ...env, ELECTRON_RUN_AS_NODE: "1" },
     stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true,
   });
-  backendProcess.stdout.on("data", (chunk) => process.stdout.write(`[backend] ${chunk}`));
-  backendProcess.stderr.on("data", (chunk) => process.stderr.write(`[backend!] ${chunk}`));
-  backendProcess.on("close", (code) => {
-    console.log(`[backend] exited with code ${code}`);
+  backendProcess.stdout.on("data", (chunk) => {
+    const s = chunk.toString().trimEnd();
+    diag("info", "[backend stdout]", s);
+  });
+  backendProcess.stderr.on("data", (chunk) => {
+    const s = chunk.toString().trimEnd();
+    diag("warn", "[backend stderr]", s);
+  });
+  backendProcess.on("close", (code, signal) => {
+    diag("warn", "backend exited", { code, signal });
     backendProcess = null;
     backendReady = false;
   });
   backendProcess.on("error", (err) => {
-    console.error("[backend] failed to start", err);
-    dialog.showErrorBox("Backend error", err.message ?? "Unable to launch the local server.");
+    diag("error", "backend spawn error", { message: err?.message ?? String(err) });
+    backendLastError = err?.message ?? String(err);
   });
 
   const ok = await waitForBackendHealth(BACKEND_READY_TIMEOUT_MS);
   if (!ok) {
-    dialog.showErrorBox(
+    showFatalDialog(
       "Server timeout",
-      `The local backend did not respond within ${BACKEND_READY_TIMEOUT_MS / 1000}s.`,
+      `The local backend did not respond within ${Math.round(
+        BACKEND_READY_TIMEOUT_MS / 1000,
+      )}s.\n\nSee log for details:\n${logFilePath}\n\nLast error: ${backendLastError ?? "n/a"}`,
     );
   }
 }
@@ -261,10 +355,19 @@ function stopBackend() {
   try {
     backendProcess.kill();
   } catch (err) {
-    console.warn("[backend] kill error", err);
+    diag("warn", "kill error", { message: err?.message ?? String(err) });
   }
   backendProcess = null;
   backendReady = false;
+}
+
+function showFatalDialog(title, message) {
+  diag("error", `${title}: ${message.replace(/\n/g, " ")}`);
+  try {
+    dialog.showErrorBox(title, message);
+  } catch {
+    // dialog may be unavailable very early in startup
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -305,9 +408,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show();
-  });
+  mainWindow.once("ready-to-show", () => mainWindow.show());
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -341,12 +442,17 @@ function setupAutoUpdater() {
 
 ipcMain.handle("get-app-version", () => app.getVersion());
 ipcMain.handle("get-api-base-url", () => getApiBaseForRenderer());
-ipcMain.handle("get-backend-status", () => ({ ready: backendReady, port: BACKEND_PORT }));
+ipcMain.handle("get-backend-status", () => ({
+  ready: backendReady,
+  port: BACKEND_PORT,
+  lastError: backendLastError,
+  logFile: logFilePath,
+}));
 ipcMain.handle("restart-backend", async () => {
   stopBackend();
   await new Promise((resolve) => setTimeout(resolve, 500));
   await startBackend();
-  return { ok: backendReady };
+  return { ok: backendReady, error: backendLastError };
 });
 ipcMain.handle("get-device-fingerprint", () => machineIdSync({ original: true }));
 ipcMain.handle("get-local-license", () => getLocalLicense());
@@ -363,12 +469,27 @@ ipcMain.handle("check-for-updates", async () => {
 });
 ipcMain.handle("quit-and-install-update", () => autoUpdater.quitAndInstall());
 ipcMain.handle("open-data-folder", () => shell.openPath(getDesktopDataDir()));
+ipcMain.handle("open-log-folder", () => {
+  const dir = path.join(app.getPath("userData"), "logs");
+  fs.mkdirSync(dir, { recursive: true });
+  return shell.openPath(dir);
+});
 
 // ---------------------------------------------------------------------------
 // App lifecycle
 // ---------------------------------------------------------------------------
 
+process.on("uncaughtException", (err) => {
+  diag("error", "uncaughtException in main", { message: err?.message ?? String(err), stack: err?.stack });
+});
+process.on("unhandledRejection", (reason) => {
+  diag("error", "unhandledRejection in main", { reason: reason?.message ?? String(reason) });
+});
+
 app.whenReady().then(async () => {
+  ensureLogStream();
+  diag("info", "app ready");
+
   await ensureLicenseStore();
   await ensureSecretStore();
 
@@ -385,13 +506,11 @@ app.whenReady().then(async () => {
   createWindow();
 
   if (!isDev) {
-    autoUpdater.checkForUpdates().catch((err) => console.warn("[updater]", err));
+    autoUpdater.checkForUpdates().catch((err) => diag("warn", "updater error", { message: err?.message }));
   }
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
