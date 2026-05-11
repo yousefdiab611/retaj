@@ -6,6 +6,7 @@ import { OfflineSyncDaemon } from "@/components/OfflineSyncDaemon";
 import { ProtectedLicenseRoute } from "@/components/ProtectedLicenseRoute";
 import { SetupGate } from "@/components/SetupGate";
 import { SuperAdminRoute } from "@/components/SuperAdminRoute";
+import { isLicensingEnabled } from "@/lib/electron";
 import { AdminCustomersPage } from "@/pages/AdminCustomersPage";
 import { AdminDashboardPage } from "@/pages/AdminDashboardPage";
 import { AdminLicensesPage } from "@/pages/AdminLicensesPage";
@@ -114,7 +115,10 @@ export default function App() {
               </ProtectedLicenseRoute>
             }
           />
-          <Route path="/license" element={<LicenseActivationPage />} />
+          <Route
+            path="/license"
+            element={isLicensingEnabled() ? <LicenseActivationPage /> : <Navigate to="/pos" replace />}
+          />
           <Route
             path="/customer"
             element={

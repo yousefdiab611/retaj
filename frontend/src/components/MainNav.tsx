@@ -14,15 +14,15 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import type { ReactNode } from "react";
-
 import { Button } from "@/components/ui/button";
 import { clearSession, getSelectedBranchId, getUser, setSelectedBranchId } from "@/lib/api";
 import { BRAND_LOGO_FALLBACK_SRC, BRAND_LOGO_PRIMARY_SRC } from "@/lib/branding";
-import { isDesktopApp } from "@/lib/electron";
+import { isDesktopApp, isLicensingEnabled } from "@/lib/electron";
 import { useOfflineSyncStatus } from "@/lib/offline/syncStatus";
 import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
 import { cn } from "@/lib/utils";
+
+import type { ReactNode } from "react";
 
 type MainNavProps = {
   endSlot?: ReactNode;
@@ -112,7 +112,7 @@ export function MainNav({ endSlot }: MainNavProps) {
             <Receipt className="h-4 w-4 opacity-90" />
             Reports
           </Link>
-          {isDesktop ? (
+          {isDesktop && isLicensingEnabled() ? (
             <Link to="/license" className={linkCls("/license")}>
               <ShieldCheck className="h-4 w-4 opacity-90" />
               License

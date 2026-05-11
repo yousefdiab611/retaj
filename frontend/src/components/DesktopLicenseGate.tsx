@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-import type { ReactNode } from "react";
-
 import { validateLicense } from "@/lib/api";
-import { getDeviceFingerprint, getLocalLicense, isDesktopApp, isLocalLicenseValid } from "@/lib/electron";
+import {
+  getDeviceFingerprint,
+  getLocalLicense,
+  isDesktopApp,
+  isLicensingEnabled,
+  isLocalLicenseValid,
+} from "@/lib/electron";
 import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
+
+import type { ReactNode } from "react";
 
 export function DesktopLicenseGate({ children }: { children: ReactNode }) {
   const [licenseChecked, setLicenseChecked] = useState(false);
@@ -17,7 +23,9 @@ export function DesktopLicenseGate({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function checkLicense() {
-      if (!isDesktopApp()) {
+      // The standalone desktop build is fully offline; licensing is opt-in
+      // via a build flag. When disabled, every authenticated user passes.
+      if (!isDesktopApp() || !isLicensingEnabled()) {
         if (!mounted) return;
         setAllowed(true);
         setLicenseChecked(true);
