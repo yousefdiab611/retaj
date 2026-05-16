@@ -20,7 +20,7 @@ RUN npm run build
 # ──────────────────────────────────────────────────────────
 # Stage 2 — nginx static server
 # ──────────────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.31-alpine AS runtime
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
