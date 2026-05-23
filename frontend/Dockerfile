@@ -3,7 +3,7 @@
 # ──────────────────────────────────────────────────────────
 # Stage 1 — install + build Vite bundle
 # ──────────────────────────────────────────────────────────
-FROM node:20.18-alpine AS build
+FROM node:26.2-alpine AS build
 WORKDIR /app
 ENV NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false
 COPY package.json package-lock.json* ./
