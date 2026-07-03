@@ -83,7 +83,7 @@ jobs:
 
   build-macos:
     name: Build macOS installer
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.include_mac)
+    if: github.event_name == 'workflow_dispatch' && inputs.include_mac
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +123,7 @@ jobs:
 
   build-linux:
     name: Build Linux installer
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.include_linux)
+    if: github.event_name == 'workflow_dispatch' && inputs.include_linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
