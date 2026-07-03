@@ -2,14 +2,14 @@ import { ShieldCheck, ArrowRight, CheckCircle2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import type { LocalLicenseData } from "@/types/electron";
-
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { activateLicense, validateLicense } from "@/lib/api";
 import { getDeviceFingerprint, getLocalLicense, isDesktopApp, saveLocalLicense } from "@/lib/electron";
+
+import type { LocalLicenseData } from "@/types/electron";
 
 export function LicenseActivationPage() {
   const navigate = useNavigate();

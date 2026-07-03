@@ -23,9 +23,8 @@ npm install
 # 2. Start the data plane (postgres, postgres-shadow, redis)
 npm run docker:up
 
-# 3. Configure env files from the templates
-cp backend/.env.example backend/.env.development
-cp frontend/.env.example frontend/.env.development
+# 3. Configure local env files with Docker defaults
+npm run setup:dev
 
 # 4. Apply DB migrations + seed demo data
 npm run db:migrate

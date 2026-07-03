@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { promisify } from "util";
 
-import { isDatabaseConnectionError } from "./errors";
 import { logger } from "./logger";
 import { rawPrisma } from "./prisma";
 

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { getDatabaseStatus, isDatabaseOnline } from "../lib/dbBootstrap";
 import { logger } from "../lib/logger";
 import { isFreshInstall, performInitialSetup } from "../services/setup.service";
 
@@ -28,11 +29,29 @@ const initialSetupSchema = z.object({
 
 export const setupController = {
   async getStatus(_req: Request, res: Response) {
+    if (!isDatabaseOnline()) {
+      res.status(503).json({
+        error: "Database unavailable",
+        code: "DATABASE_UNAVAILABLE",
+        status: getDatabaseStatus(),
+      });
+      return;
+    }
+
     const fresh = await isFreshInstall();
     res.json({ needsSetup: fresh });
   },
 
   async runInitialSetup(req: Request, res: Response) {
+    if (!isDatabaseOnline()) {
+      res.status(503).json({
+        error: "Database unavailable",
+        code: "DATABASE_UNAVAILABLE",
+        status: getDatabaseStatus(),
+      });
+      return;
+    }
+
     const parsed = initialSetupSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({

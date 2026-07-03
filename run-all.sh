@@ -136,8 +136,8 @@ else
 
     # 3. Electron package
     if [ -z "${ERROR_LOGS[frontend]}" ]; then
-        info "Running: npm run electron-pack-win..."
-        npm run electron-pack-win > /dev/null 2>&1
+        info "Running: npm run electron-pack:win..."
+        npm run electron-pack:win > /dev/null 2>&1
         if [ $? -eq 0 ]; then
             success "Desktop EXE built successfully"
             SUCCESS_LOGS["desktop_build"]="Electron Windows EXE packaged"

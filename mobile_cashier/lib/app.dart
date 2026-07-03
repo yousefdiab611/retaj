@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import 'screens/cart_checkout_screen.dart';
 import 'screens/login_screen.dart';

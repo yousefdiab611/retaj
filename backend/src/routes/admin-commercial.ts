@@ -9,56 +9,39 @@ const adminRouter = Router();
 adminRouter.use(requireAuth);
 adminRouter.use(requireRole(UserRole.ADMIN, UserRole.TENANT_ADMIN));
 
+const notImplemented = (
+  _req: unknown,
+  res: { status: (code: number) => { json: (body: unknown) => void } },
+) => {
+  res.status(501).json({ error: "Commercial admin endpoint not implemented", code: "NOT_IMPLEMENTED" });
+};
+
 // Dashboard stats
-adminRouter.get("/stats", async (req, res) => {
-  // Aggregate stats: sales, customers, licenses, etc.
-  res.json({ stats: {} });
-});
+adminRouter.get("/stats", notImplemented);
 
 // Customer management
-adminRouter.get("/customers", async (req, res) => {
-  // List customers
-  res.json({ customers: [] });
-});
+adminRouter.get("/customers", notImplemented);
 
-adminRouter.post("/customers", async (req, res) => {
-  // Create customer
-});
+adminRouter.post("/customers", notImplemented);
 
-adminRouter.put("/customers/:id", async (req, res) => {
-  // Update customer
-});
+adminRouter.put("/customers/:id", notImplemented);
 
 // Subscription management
-adminRouter.get("/subscriptions", async (req, res) => {
-  // List subscriptions
-});
+adminRouter.get("/subscriptions", notImplemented);
 
 // License management
-adminRouter.post("/licenses", async (req, res) => {
-  // Generate license
-});
+adminRouter.post("/licenses", notImplemented);
 
-adminRouter.post("/licenses/:id/revoke", async (req, res) => {
-  // Revoke license
-});
+adminRouter.post("/licenses/:id/revoke", notImplemented);
 
 // Monitoring
-adminRouter.get("/alerts", async (req, res) => {
-  // List alerts
-});
+adminRouter.get("/alerts", notImplemented);
 
-adminRouter.get("/backups", async (req, res) => {
-  // List backups
-});
+adminRouter.get("/backups", notImplemented);
 
 // Support
-adminRouter.get("/tickets", async (req, res) => {
-  // List support tickets
-});
+adminRouter.get("/tickets", notImplemented);
 
-adminRouter.post("/tickets", async (req, res) => {
-  // Create ticket
-});
+adminRouter.post("/tickets", notImplemented);
 
 export { adminRouter };

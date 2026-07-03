@@ -37,10 +37,7 @@ module.exports = {
     "mobile_cashier",
   ],
   rules: {
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
-    ],
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
@@ -49,16 +46,7 @@ module.exports = {
     "import/order": [
       "warn",
       {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-          "object",
-          "type",
-        ],
+        groups: ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
         "newlines-between": "always",
         alphabetize: { order: "asc", caseInsensitive: true },
       },
@@ -66,6 +54,7 @@ module.exports = {
     "import/no-duplicates": "error",
     // false positives on CJS packages re-exported through esModuleInterop
     "import/default": "off",
+    "import/no-named-as-default": "off",
     "import/no-named-as-default-member": "off",
     "import/namespace": "off",
     "no-console": ["warn", { allow: ["warn", "error", "info"] }],

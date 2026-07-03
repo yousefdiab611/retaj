@@ -127,7 +127,7 @@ export const billingController = {
     let event: Stripe.Event;
     try {
       event = verifyStripeWebhookSignature(rawBody, signature);
-    } catch (err) {
+    } catch {
       res.status(400).json({ error: "Webhook signature verification failed" });
       return;
     }

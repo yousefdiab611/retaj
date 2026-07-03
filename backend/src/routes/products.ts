@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import { prisma } from "../lib/prisma";
 
+import type { Prisma } from "@prisma/client";
+
 export const productsRouter = Router();
 
 const productPublicSelect = {
@@ -178,9 +180,7 @@ productsRouter.get("/", async (req, res) => {
 
   const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
   const categoryFilter = typeof req.query.category === "string" ? req.query.category.trim() : "";
-  const statusFilter = typeof req.query.status === "string" ? req.query.status.trim().toLowerCase() : "";
-
-  const baseWhere: any = { branchId, isActive: true };
+  const baseWhere: Prisma.ProductWhereInput = { branchId, isActive: true };
   if (q) {
     baseWhere.AND = [
       {

@@ -48,7 +48,7 @@ export function openOfflineDb(): Promise<IDBDatabase> {
 export async function withOfflineStore<T>(
   storeName: string,
   mode: IDBTransactionMode,
-  callback: (store: IDBObjectStore) => IDBRequest<any>,
+  callback: (store: IDBObjectStore) => IDBRequest,
 ): Promise<T> {
   const db = await openOfflineDb();
   return new Promise((resolve, reject) => {

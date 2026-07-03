@@ -1,5 +1,5 @@
 class AlertService {
-  async sendAlert(type: string, severity: string, message: string, details?: any) {
+  async sendAlert(_type: string, _severity: string, _message: string, _details?: unknown) {
     // Save to DB
     // await prisma.alert.create({ data: { type, severity, message, details } });
 

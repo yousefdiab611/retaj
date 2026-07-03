@@ -1,10 +1,11 @@
+import { PaymentProvider, type Prisma } from "@prisma/client";
+
 import { prisma } from "../lib/prisma";
 
 import { createLicenseRecord } from "./license.service";
 import { billingPlans } from "./payment.service";
 
 import type { BillingPlanDefinition } from "./payment.service";
-import type { Prisma } from "@prisma/client";
 
 async function getOrCreateTenantBillingCustomer(tenantId: string) {
   const existing = await prisma.customer.findFirst({
@@ -82,7 +83,8 @@ export async function recordPaymentForSubscription(params: {
     data: {
       tenantId: params.tenantId,
       subscriptionId: params.subscriptionId,
-      provider: params.provider as any,
+      provider:
+        params.provider in PaymentProvider ? (params.provider as PaymentProvider) : PaymentProvider.OFFLINE,
       providerPaymentId: params.providerPaymentId,
       status: params.success ? "SUCCEEDED" : "FAILED",
       amountCents: params.amountCents,

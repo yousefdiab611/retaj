@@ -1,6 +1,6 @@
 {
   "name": "retaj-store",
-  "version": "1.1.0",
+  "version": "1.2.8",
   "private": true,
   "description": "Retaj Store — multi-tenant POS, inventory, billing & desktop app monorepo",
   "engines": {
@@ -21,6 +21,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
+    "setup:dev": "node scripts/setup-dev-env.cjs",
     "dev:backend": "npm --workspace backend run dev",
     "dev:frontend": "npm --workspace frontend run dev",
     "dev:desktop": "npm --workspace frontend run electron-dev",

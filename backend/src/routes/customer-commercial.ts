@@ -6,21 +6,20 @@ const customerRouter = Router();
 
 customerRouter.use(requireAuth);
 
+const notImplemented = (
+  _req: unknown,
+  res: { status: (code: number) => { json: (body: unknown) => void } },
+) => {
+  res.status(501).json({ error: "Commercial customer endpoint not implemented", code: "NOT_IMPLEMENTED" });
+};
+
 // Customer self-service
-customerRouter.get("/profile", async (req, res) => {
-  // Get customer profile
-});
+customerRouter.get("/profile", notImplemented);
 
-customerRouter.put("/profile", async (req, res) => {
-  // Update profile
-});
+customerRouter.put("/profile", notImplemented);
 
-customerRouter.get("/subscription", async (req, res) => {
-  // Get subscription
-});
+customerRouter.get("/subscription", notImplemented);
 
-customerRouter.post("/support", async (req, res) => {
-  // Submit support request
-});
+customerRouter.post("/support", notImplemented);
 
 export { customerRouter };

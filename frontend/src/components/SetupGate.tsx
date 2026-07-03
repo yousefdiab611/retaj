@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { fetchSetupStatus } from "@/lib/api";
+import { ApiResponseError, fetchSetupStatus } from "@/lib/api";
 
 type Status = "loading" | "needsSetup" | "ready" | "error";
 
@@ -20,6 +20,7 @@ const MAX_ATTEMPTS = 40; // ~60 seconds — backend usually ready within 10s
  */
 export function SetupGate({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status>("loading");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,8 +44,16 @@ export function SetupGate({ children }: { children: ReactNode }) {
             navigate("/login", { replace: true });
           }
         }
-      } catch {
+      } catch (error) {
         if (cancelled) return;
+        if (
+          error instanceof ApiResponseError &&
+          (error.code === "DATABASE_UNAVAILABLE" || error.status === 503)
+        ) {
+          setErrorMessage("قاعدة البيانات غير متاحة. شغّل Docker/PostgreSQL ثم أعد المحاولة.");
+          setStatus("error");
+          return;
+        }
         setAttempt((n) => {
           const next = n + 1;
           if (next >= MAX_ATTEMPTS) {
@@ -76,7 +85,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
     return (
       <Splash
         title="تعذّر الاتصال بالخادم المحلي"
-        subtitle="افتح لوجات التطبيق (مجلد retaj-store-frontend\\logs) وأعد المحاولة."
+        subtitle={errorMessage ?? "افتح لوجات التطبيق (مجلد retaj-store-frontend\\logs) وأعد المحاولة."}
         attempt={attempt}
         showReload
       />

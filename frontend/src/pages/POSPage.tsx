@@ -15,8 +15,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { List } from "react-window";
 
-import type { Product } from "@/types/product";
-
 import { BarcodeScannerDialog } from "@/components/BarcodeScannerDialog";
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
@@ -57,6 +55,8 @@ import { useOnlineStatus } from "@/lib/offline/useOnlineStatus";
 import { printThermalReceipt, printThermalReceiptOffline } from "@/lib/printThermalReceipt";
 import { uniqueCategories } from "@/lib/productUtils";
 import { cn } from "@/lib/utils";
+
+import type { Product } from "@/types/product";
 
 type Locale = "en" | "ar";
 
@@ -723,7 +723,6 @@ export function POSPage() {
     selectedCustomer,
     selectedWarehouseId,
     subtotal,
-    tax,
     total,
     t.saleComplete,
   ]);
@@ -1035,6 +1034,9 @@ export function POSPage() {
               </div>
               <p className="text-xs text-muted-foreground">
                 {locale === "ar" ? "بعد الخصم" : "After discount"}: {formatMoney(taxable, locale)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t.tax}: {formatMoney(tax, locale)}
               </p>
             </div>
             <Button

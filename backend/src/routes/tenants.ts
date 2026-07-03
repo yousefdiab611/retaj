@@ -1,4 +1,4 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Router } from "express";
 
 import { createTenant, getTenantById, listTenants, updateTenant } from "../services/tenant.service";

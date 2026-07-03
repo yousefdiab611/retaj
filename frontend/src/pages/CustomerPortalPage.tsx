@@ -13,11 +13,42 @@ import {
   sendSupportRequest,
 } from "@/lib/api";
 
+import type { LicenseRow } from "@/types/billing";
+import type { AuthUser } from "@/types/user";
+
+type CustomerTenant = {
+  id: string;
+  name: string;
+  plan: string;
+  billingStatus: string;
+  planExpiresAt: string | null;
+};
+
+type CustomerProfile = {
+  user: AuthUser;
+  tenant: CustomerTenant;
+};
+
+type CustomerSubscription = {
+  id: string;
+  plan: string;
+  status: string;
+  currentPeriodEnd: string | null;
+};
+
+type CustomerDevice = {
+  id: string;
+  deviceId: string;
+  type: string;
+  isActive: boolean;
+  updatedAt: string;
+};
+
 export function CustomerPortalPage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [subscription, setSubscription] = useState<any[]>([]);
-  const [devices, setDevices] = useState<any[]>([]);
-  const [licenses, setLicenses] = useState<any[]>([]);
+  const [profile, setProfile] = useState<CustomerProfile["user"] | null>(null);
+  const [subscription, setSubscription] = useState<CustomerSubscription[]>([]);
+  const [devices, setDevices] = useState<CustomerDevice[]>([]);
+  const [licenses, setLicenses] = useState<LicenseRow[]>([]);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string | null>(null);

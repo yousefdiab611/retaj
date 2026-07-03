@@ -8,23 +8,22 @@ const billingRouter = Router();
 
 billingRouter.use(requireAuth);
 
+const notImplemented = (
+  _req: unknown,
+  res: { status: (code: number) => { json: (body: unknown) => void } },
+) => {
+  res.status(501).json({ error: "Commercial billing endpoint not implemented", code: "NOT_IMPLEMENTED" });
+};
+
 // Invoice generation
-billingRouter.post("/invoices", requireRole(UserRole.ADMIN), async (req, res) => {
-  // Generate invoice
-});
+billingRouter.post("/invoices", requireRole(UserRole.ADMIN), notImplemented);
 
 // Payment recording
-billingRouter.post("/payments", async (req, res) => {
-  // Record payment
-});
+billingRouter.post("/payments", notImplemented);
 
 // Subscription management
-billingRouter.post("/subscriptions", requireRole(UserRole.ADMIN), async (req, res) => {
-  // Create subscription
-});
+billingRouter.post("/subscriptions", requireRole(UserRole.ADMIN), notImplemented);
 
-billingRouter.put("/subscriptions/:id", requireRole(UserRole.ADMIN), async (req, res) => {
-  // Update subscription
-});
+billingRouter.put("/subscriptions/:id", requireRole(UserRole.ADMIN), notImplemented);
 
 export { billingRouter };

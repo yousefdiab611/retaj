@@ -8,6 +8,8 @@ import { fetchTransactionInvoice } from "@/lib/api";
 import { BRAND_LOGO_PRIMARY_SRC, BRAND_LOGO_FALLBACK_SRC } from "@/lib/branding";
 import { generateQrCodeDataUrl } from "@/lib/qr";
 
+import type { InvoiceTransaction } from "@/types/invoice";
+
 type Locale = "en" | "ar";
 
 const translations: Record<Locale, Record<string, string>> = {
@@ -76,7 +78,7 @@ export function InvoicePage() {
   const [locale] = useState<Locale>("ar");
   const t = translations[locale];
 
-  const [invoice, setInvoice] = useState<any>(null);
+  const [invoice, setInvoice] = useState<InvoiceTransaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -264,7 +266,7 @@ export function InvoicePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.lines.map((line: any) => (
+                  {invoice.lines.map((line) => (
                     <tr key={line.id} className="border-b border-border last:border-none">
                       <td className="px-3 py-3 text-right font-medium">{line.name}</td>
                       <td className="px-3 py-3 text-center">{line.quantity}</td>

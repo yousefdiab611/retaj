@@ -1,7 +1,7 @@
+import { getToken, syncOfflineTransactionsRequest } from "@/lib/api";
+
 import { getOfflineCustomerByLocalId } from "./customersDb";
 import { listPendingSales, removePendingSale, updatePendingSaleRetry } from "./pendingSalesDb";
-
-import { getToken, syncOfflineTransactionsRequest } from "@/lib/api";
 
 let backoffMs = 2000;
 let flushInFlight: Promise<void> | null = null;

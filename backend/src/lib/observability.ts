@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 
-import type { Application, NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 /**
  * Lazily initialised Sentry instance. We avoid importing @sentry/node at the

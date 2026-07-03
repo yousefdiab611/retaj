@@ -23,7 +23,7 @@ backupRouter.post("/create", async (req, res) => {
   try {
     const result = await backupService.createBackup(tenantId, type);
     res.status(201).json({ backup: result });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: "Failed to create backup", code: "BACKUP_FAILED" });
   }
 });

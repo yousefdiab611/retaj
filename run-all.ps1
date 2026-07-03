@@ -116,8 +116,8 @@ try {
     }
 
     # 3. Electron package (Windows EXE)
-    Write-Info "Running: npm run electron-pack-win..."
-    npm run electron-pack-win 2>&1 | Out-Null
+    Write-Info "Running: npm run electron-pack:win..."
+    npm run electron-pack:win 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Success "Desktop EXE built successfully"
         $SuccessLogs["desktop_build"] = "Electron Windows EXE packaged"

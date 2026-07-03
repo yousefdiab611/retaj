@@ -1,7 +1,7 @@
+import { createCustomerRequest, getToken, updateCustomerRequest } from "@/lib/api";
+
 import { listDirtyOfflineCustomers, markOfflineCustomerSynced } from "./customersDb";
 import { setLastSyncAt } from "./syncMeta";
-
-import { createCustomerRequest, getToken, updateCustomerRequest } from "@/lib/api";
 
 let customerSyncLock: Promise<void> | null = null;
 

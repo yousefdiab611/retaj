@@ -309,7 +309,7 @@ export async function lookupProductByCode(code: string, warehouseId?: string): P
     }
     const data = (await res.json()) as { product: Product };
     return data.product;
-  } catch (err) {
+  } catch {
     return lookupCachedProductByCode(trimmed, warehouseId);
   }
 }
@@ -915,6 +915,17 @@ export async function updateTenantApi(
 // ---------------------------------------------------------------------------
 
 export type SetupStatus = { needsSetup: boolean };
+export class ApiResponseError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+    this.name = "ApiResponseError";
+  }
+}
+
 export type InitialSetupPayload = {
   businessName: string;
   branchName: string;
@@ -928,7 +939,18 @@ export type InitialSetupPayload = {
 
 export async function fetchSetupStatus(): Promise<SetupStatus> {
   const res = await fetch(apiUrl("/api/setup/status"), { method: "GET" });
-  if (!res.ok) throw new Error(await readError(res));
+  if (!res.ok) {
+    let code: string | undefined;
+    let message = res.statusText;
+    try {
+      const payload = (await res.json()) as { error?: string; code?: string };
+      message = payload.error ?? message;
+      code = payload.code;
+    } catch {
+      message = res.statusText;
+    }
+    throw new ApiResponseError(message, res.status, code);
+  }
   return (await res.json()) as SetupStatus;
 }
 

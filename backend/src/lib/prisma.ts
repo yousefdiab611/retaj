@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import { DatabaseUnavailableError, isDatabaseConnectionError } from "./errors";
 import { logger } from "./logger";
 
-import type { Prisma } from "@prisma/client";
-
 const globalForPrisma = globalThis as unknown as { rawPrisma: PrismaClient | undefined };
 
 export const rawPrisma =
@@ -18,7 +16,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 function createSafePrisma<T extends object>(target: T): T {
-  const handler: ProxyHandler<any> = {
+  const handler: ProxyHandler<T> = {
     get(targetObj, property, receiver) {
       const value = Reflect.get(targetObj, property, receiver);
       if (typeof value === "function") {
@@ -36,7 +34,7 @@ function createSafePrisma<T extends object>(target: T): T {
       }
 
       if (value && typeof value === "object") {
-        return new Proxy(value, handler);
+        return createSafePrisma(value);
       }
 
       return value;

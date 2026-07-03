@@ -22,9 +22,9 @@
  *
  * Re-run safely: dist-electron-staging/ is wiped at the start of every run.
  */
+const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const BACKEND_SRC = path.join(REPO_ROOT, "backend");
@@ -76,10 +76,7 @@ function writeStagingPackageJson(srcPkg) {
       schema: "prisma-desktop/schema.prisma",
     },
   };
-  fs.writeFileSync(
-    path.join(STAGING_BACKEND, "package.json"),
-    JSON.stringify(stripped, null, 2) + "\n",
-  );
+  fs.writeFileSync(path.join(STAGING_BACKEND, "package.json"), JSON.stringify(stripped, null, 2) + "\n");
 }
 
 function main() {
@@ -102,7 +99,7 @@ function main() {
   writeStagingPackageJson(srcPkg);
 
   console.log("--> installing production dependencies inside staging");
-  run("npm install --omit=optional --no-audit --no-fund", STAGING_BACKEND);
+  run("npm install --omit=optional --ignore-scripts --no-audit --no-fund", STAGING_BACKEND);
 
   console.log("--> generating Prisma client (with Windows binary engine)");
   run(

@@ -165,7 +165,7 @@ export async function activateLicense(
 export async function validateLicense(
   licenseKey: string,
   deviceId: string,
-  deviceFingerprint: string,
+  _deviceFingerprint: string,
 ): Promise<
   | {
       ok: true;

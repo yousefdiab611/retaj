@@ -14,6 +14,10 @@ function normalizeCode(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function toProduct({ syncedAt: _syncedAt, updatedAt: _updatedAt, ...product }: CachedProductRecord): Product {
+  return product;
+}
+
 export async function saveCachedProducts(products: Product[], warehouseId?: string): Promise<void> {
   const now = Date.now();
   await withOfflineStore<void>(STORE, "readwrite", (store) => {
@@ -33,7 +37,7 @@ export async function getCachedProducts(warehouseId?: string): Promise<Product[]
   const rows: CachedProductRecord[] = warehouseId
     ? await getFromIndex<CachedProductRecord>(STORE, "warehouseId", warehouseId)
     : await getAllFromStore<CachedProductRecord>(STORE);
-  return rows.map(({ syncedAt, updatedAt, ...product }) => product);
+  return rows.map(toProduct);
 }
 
 export async function searchCachedProducts(query: string, warehouseId?: string): Promise<Product[]> {
@@ -49,7 +53,7 @@ export async function searchCachedProducts(query: string, warehouseId?: string):
       })
     : rows;
 
-  return filtered.map(({ syncedAt, updatedAt, ...product }) => product);
+  return filtered.map(toProduct);
 }
 
 export async function lookupCachedProductByCode(code: string, warehouseId?: string): Promise<Product> {
@@ -68,8 +72,7 @@ export async function lookupCachedProductByCode(code: string, warehouseId?: stri
     throw new Error("Product not found in cache");
   }
 
-  const { syncedAt, updatedAt, ...product } = hit;
-  return product;
+  return toProduct(hit);
 }
 
 export async function getProductCacheTimestamp(warehouseId: string): Promise<number | null> {

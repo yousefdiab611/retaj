@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 
-import type { ReactNode } from "react";
-
 import { clearSession, ensureDefaultBranchSelection, getToken, getUser } from "@/lib/api";
+
+import type { ReactNode } from "react";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const token = getToken();

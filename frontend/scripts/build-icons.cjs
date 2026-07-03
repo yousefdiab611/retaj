@@ -11,6 +11,7 @@
  */
 const fs = require("fs");
 const path = require("path");
+
 const sharp = require("sharp");
 // png-to-ico v3 is pure ESM, so importing it from a .cjs file requires a
 // dynamic import. We unwrap the module's default export inside main().

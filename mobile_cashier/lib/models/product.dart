@@ -3,10 +3,10 @@ class Product {
     required this.id,
     required this.sku,
     required this.name,
+    required this.category,
     required this.price,
     required this.stockQty,
     this.barcode,
-    this.category,
   });
 
   final String id;

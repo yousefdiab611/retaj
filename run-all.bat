@@ -102,8 +102,8 @@ if !errorlevel! neq 0 (
 echo %SUCCESS% Frontend built successfully
 
 REM Electron package
-echo %INFO% Running: npm run electron-pack-win...
-call npm run electron-pack-win
+echo %INFO% Running: npm run electron-pack:win...
+call npm run electron-pack:win
 if !errorlevel! neq 0 (
     echo %WARN% Desktop EXE build failed - continuing
     goto :MOBILE_BUILD

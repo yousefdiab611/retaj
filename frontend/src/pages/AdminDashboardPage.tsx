@@ -1,11 +1,11 @@
 import { CreditCard, Key, Layers, ShieldAlert, Package, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { AdminDashboardStats } from "@/types/billing";
-
 import { MainNav } from "@/components/MainNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAdminDashboardStats } from "@/lib/api";
+
+import type { AdminDashboardStats } from "@/types/billing";
 
 export function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);

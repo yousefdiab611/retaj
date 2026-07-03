@@ -1,8 +1,6 @@
 import { Search, Users, Edit3 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { CustomerRow } from "@/types/billing";
-
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchAdminCustomers, updateCustomerRequest } from "@/lib/api";
+
+import type { CustomerRow } from "@/types/billing";
 
 export function AdminCustomersPage() {
   const [customers, setCustomers] = useState<CustomerRow[]>([]);

@@ -18,28 +18,28 @@ export interface InvoiceForPDF {
   tax: number;
   discount: number;
   customerName: string;
-  customerPhone?: string;
-  lastPaymentDate?: Date;
+  customerPhone?: string | null;
+  lastPaymentDate?: Date | null;
   previousInvoiceCount: number;
   loyaltyPointsEarned: number;
   loyaltyPointsBefore: number;
   loyaltyPointsAfter: number;
-  paymentMethod?: string;
+  paymentMethod?: string | null;
   currency: string;
   status: string;
   dueDate: Date;
-  paidAt?: Date;
-  qrCodeUrl?: string;
+  paidAt?: Date | null;
+  qrCodeUrl?: string | null;
   createdAt: Date;
   tenant: {
     name: string;
-    storeAddress?: string;
-    storePhone?: string;
-    invoiceLogoUrl?: string;
+    storeAddress?: string | null;
+    storePhone?: string | null;
+    invoiceLogoUrl?: string | null;
     invoiceThankYou: string;
-    invoiceFooterNote?: string;
-    invoicePrimaryColor?: string;
-    invoiceSecondaryColor?: string;
+    invoiceFooterNote?: string | null;
+    invoicePrimaryColor?: string | null;
+    invoiceSecondaryColor?: string | null;
   };
 }
 
@@ -60,8 +60,6 @@ export async function generateInvoicePDF(invoice: InvoiceForPDF, outputPath: str
       doc.pipe(stream);
 
       const primaryColor = invoice.tenant.invoicePrimaryColor || "#1F2937";
-      const secondaryColor = invoice.tenant.invoiceSecondaryColor || "#3B82F6";
-
       // Header with logo
       if (invoice.tenant.invoiceLogoUrl) {
         try {

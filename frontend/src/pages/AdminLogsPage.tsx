@@ -1,11 +1,11 @@
 import { ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import type { AuditLogRow } from "@/types/billing";
-
 import { MainNav } from "@/components/MainNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAdminLogs } from "@/lib/api";
+
+import type { AuditLogRow } from "@/types/billing";
 
 export function AdminLogsPage() {
   const [logs, setLogs] = useState<AuditLogRow[]>([]);

@@ -8,13 +8,12 @@ import { writeAuditLog } from "../services/audit.service";
 import {
   createOrUpdateInvoice,
   getInvoiceWithDetails,
-  generateInvoiceNumber,
   recordLoyaltyPoints,
   updateCustomerBalance,
   getCustomerRecentTransactions,
 } from "../services/invoiceEnterprise.service";
 import { generateInvoicePDF, getInvoicePDFPath, saveInvoicePDF } from "../services/pdfInvoice.service";
-import { generateInvoiceQRCode, generateThermalReceiptQRCode } from "../services/qrCode.service";
+import { generateInvoiceQRCode } from "../services/qrCode.service";
 import {
   generateThermalReceipt80mm,
   generateThermalReceipt58mm,
@@ -23,7 +22,7 @@ import {
   type ReceiptData,
 } from "../services/thermalReceipt.service";
 
-import type { UserRole } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 const invoiceRouter = Router();
 
@@ -39,20 +38,6 @@ const createInvoiceSchema = z.object({
   paymentMethod: z.string().optional(),
   dueDate: z.string().datetime(),
   notes: z.string().optional(),
-});
-
-const generatePDFSchema = z.object({
-  invoiceId: z.string().cuid(),
-});
-
-const generateReceiptSchema = z.object({
-  invoiceId: z.string().cuid(),
-  width: z.enum(["80", "58"]).optional(),
-  format: z.enum(["text", "html", "json"]).optional(),
-});
-
-const generateQRCodeSchema = z.object({
-  invoiceId: z.string().cuid(),
 });
 
 const updateInvoicePaymentSchema = z.object({
@@ -178,9 +163,9 @@ invoiceRouter.get("/", requireAuth, async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const where: any = { tenantId };
-    if (customerId) where.customerId = customerId;
-    if (status) where.status = status;
+    const where: Prisma.InvoiceWhereInput = { tenantId };
+    if (typeof customerId === "string") where.customerId = customerId;
+    if (typeof status === "string") where.status = status;
 
     const invoices = await prisma.invoice.findMany({
       where,
@@ -235,7 +220,7 @@ invoiceRouter.post(
 
       // Generate PDF
       const pdfPath = getInvoicePDFPath(tenantId, invoice.number);
-      await generateInvoicePDF(invoice as any, pdfPath);
+      await generateInvoicePDF(invoice, pdfPath);
       await saveInvoicePDF(invoiceId, pdfPath);
 
       // Audit log
@@ -300,18 +285,16 @@ invoiceRouter.post("/:invoiceId/receipt", requireAuth, async (req: Request, res:
       thankYouMessage: invoice.tenant.invoiceThankYou,
     };
 
-    let result: any;
-
     if (format === "html") {
-      result = generateThermalReceiptHTML(receiptData, parseInt(width) as 80 | 58);
+      const result = generateThermalReceiptHTML(receiptData, parseInt(width) as 80 | 58);
       res.setHeader("Content-Type", "text/html");
       res.send(result);
     } else if (format === "json") {
-      result = generateReceiptJSON(receiptData);
+      const result = generateReceiptJSON(receiptData);
       res.json(result);
     } else {
       // Text format
-      result =
+      const result =
         parseInt(width) === 80
           ? generateThermalReceipt80mm(receiptData)
           : generateThermalReceipt58mm(receiptData);

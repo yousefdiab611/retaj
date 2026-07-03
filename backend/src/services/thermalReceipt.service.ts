@@ -6,13 +6,6 @@
 
 export type PrinterWidth = 80 | 58; // millimeters
 
-interface ReceiptLine {
-  text: string;
-  align: "left" | "center" | "right";
-  bold?: boolean;
-  size?: "small" | "normal" | "large";
-}
-
 export interface ReceiptData {
   storeName: string;
   storePhone?: string;

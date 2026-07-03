@@ -1,14 +1,14 @@
 import { Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import type { LicenseRow } from "@/types/billing";
-import type { ChangeEvent } from "react";
-
 import { MainNav } from "@/components/MainNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { fetchAdminLicenses } from "@/lib/api";
+
+import type { LicenseRow } from "@/types/billing";
+import type { ChangeEvent } from "react";
 
 export function AdminLicensesPage() {
   const [loading, setLoading] = useState(true);

@@ -36,12 +36,12 @@ A single `.exe` installer that bundles three things:
 
 ## Per-user paths on Windows
 
-| Purpose                   | Location                                    |
-| ------------------------- | ------------------------------------------- |
-| SQLite database           | `%APPDATA%\Retaj Store\data\retaj.db`       |
-| Encrypted license store   | `%APPDATA%\Retaj Store\license-store.json`  |
-| Encrypted secrets store   | `%APPDATA%\Retaj Store\retaj-secrets.json`  |
-| Electron logs             | `%APPDATA%\Retaj Store\logs\`               |
+| Purpose                 | Location                                   |
+| ----------------------- | ------------------------------------------ |
+| SQLite database         | `%APPDATA%\Retaj Store\data\retaj.db`      |
+| Encrypted license store | `%APPDATA%\Retaj Store\license-store.json` |
+| Encrypted secrets store | `%APPDATA%\Retaj Store\retaj-secrets.json` |
+| Electron logs           | `%APPDATA%\Retaj Store\logs\`              |
 
 The user can open the data folder from the in-app menu (IPC channel
 `open-data-folder`) — useful for backups.

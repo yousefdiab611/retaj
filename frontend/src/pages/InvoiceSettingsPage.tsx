@@ -99,7 +99,7 @@ export function InvoiceSettingsPage() {
 
       setMessage({ type: "success", text: t.saved });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
+    } catch {
       setMessage({ type: "error", text: t.error });
     } finally {
       setSaving(false);
