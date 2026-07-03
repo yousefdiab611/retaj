@@ -75,9 +75,10 @@ jobs:
         with:
           name: retaj-desktop-windows
           path: |
-            dist-electron/**/*.exe
-            dist-electron/**/*.msi
-            dist-electron/**/latest*.yml
+            dist-electron/Retaj-Store-Setup-*.exe
+            dist-electron/Retaj-POS-Portable-*.exe
+            dist-electron/*.blockmap
+            dist-electron/latest*.yml
           if-no-files-found: warn
           retention-days: 30
 
