@@ -29,7 +29,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@prisma/client": "^6.6.0",
-    "@sentry/node": "^8.55.2",
+    "@sentry/node": "^10.63.0",
     "axios": "^1.15.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
